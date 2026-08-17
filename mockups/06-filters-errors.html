@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Cache — Filters &amp; Error States</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Unbounded:wght@700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<style>body{background:#f0f0f0; margin:0; padding:2rem;}</style>
+</head>
+<body>
+<div style="display:flex; gap:18px; justify-content:center; flex-wrap:wrap; font-family:Inter,sans-serif;">
+
+<div style="width:230px;">
+<p style="font-size:11px; font-weight:600; color:#6b6b6b; text-align:center; margin:0 0 8px;">Filters dropdown</p>
+<div style="background:#FDF6ED; border-radius:16px; overflow:hidden; color:#260503;">
+<div style="display:flex; align-items:center; justify-content:space-between; padding:16px 18px 0;">
+<span style="font-size:14px; font-weight:600;">My Cache</span>
+<span style="padding:6px 10px; background:#3D5A48; color:#fff; border-radius:999px; font-size:10px;">Filters (2) ▾</span>
+</div>
+<div style="margin:10px 18px 0; background:#ffffff; border-radius:10px; box-shadow:0 4px 16px rgba(0,0,0,0.08);">
+<div style="padding:6px 14px;">
+<label style="display:flex; align-items:center; gap:8px; padding:8px 0; border-bottom:1px solid rgba(38,5,3,0.06);"><div style="width:15px; height:15px; border-radius:4px; background:#6E8243;"></div><span style="font-size:11px;">Watches</span></label>
+<label style="display:flex; align-items:center; gap:8px; padding:8px 0; border-bottom:1px solid rgba(38,5,3,0.06);"><div style="width:15px; height:15px; border-radius:4px; border:1.5px solid #b0b0b0;"></div><span style="font-size:11px;">Bags</span></label>
+<label style="display:flex; align-items:center; gap:8px; padding:8px 0;"><div style="width:15px; height:15px; border-radius:4px; background:#6E8243;"></div><span style="font-size:11px;">Shoes</span></label>
+</div>
+<div style="padding:8px 14px 12px; display:flex; gap:6px;">
+<button style="flex:1; height:32px; background:#fff; border:1px solid rgba(38,5,3,0.15); border-radius:6px; font-size:10px;">Clear</button>
+<button style="flex:1; height:32px; background:#C91B46; color:#fff; border:none; border-radius:6px; font-size:10px; font-weight:600;">Apply</button>
+</div>
+</div>
+<div style="height:70px;"></div>
+</div>
+<p style="font-size:10px; color:#888; text-align:center; margin-top:6px;">Selected checkboxes = olive-lime, per updated color-role rules</p>
+</div>
+
+<div style="width:230px;">
+<p style="font-size:11px; font-weight:600; color:#6b6b6b; text-align:center; margin:0 0 8px;">Login error</p>
+<div style="background:#FDF6ED; border-radius:16px; overflow:hidden; color:#260503; padding:24px 18px;">
+<label style="font-size:10px; font-weight:500; color:#6b6b6b;">Password</label>
+<input value="••••••••" style="width:100%; height:40px; background:#fdece0; border:1.5px solid #E76607; border-radius:8px; padding:0 12px; font-size:12px; margin:4px 0 0; box-sizing:border-box; color:#260503;">
+<p style="font-size:10px; color:#E76607; margin:5px 0 0; display:flex; align-items:center; gap:4px;"><i class="ti ti-alert-circle" style="font-size:13px;"></i>That password doesn't match this account.</p>
+</div>
+</div>
+
+<div style="width:230px;">
+<p style="font-size:11px; font-weight:600; color:#6b6b6b; text-align:center; margin:0 0 8px;">Register error</p>
+<div style="background:#FDF6ED; border-radius:16px; overflow:hidden; color:#260503; padding:24px 18px;">
+<label style="font-size:10px; font-weight:500; color:#6b6b6b;">Phone number</label>
+<input value="(555) 123-4567" style="width:100%; height:40px; background:#fdece0; border:1.5px solid #E76607; border-radius:8px; padding:0 12px; font-size:12px; margin:4px 0 0; box-sizing:border-box; color:#260503;">
+<p style="font-size:10px; color:#E76607; margin:5px 0 0; display:flex; align-items:center; gap:4px;"><i class="ti ti-alert-circle" style="font-size:13px;"></i>An account already exists for this number.</p>
+</div>
+</div>
+
+</div>
+</body>
+</html>
