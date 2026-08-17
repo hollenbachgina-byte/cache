@@ -1,0 +1,10 @@
+flask
+flask-sqlalchemy
+flask-migrate
+flask-admin
+flask-login
+psycopg2-binary
+python-dotenv
+phonenumbers
+Pillow
+gunicorn
