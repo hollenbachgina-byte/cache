@@ -179,3 +179,54 @@ body {
   font-size: 28px;
   color: #fff;
 }
+
+/* Bottom nav — neutral inactive-state grey matches the mockups' own convention
+   (not one of the 6 brand tokens; same category as --color-muted) */
+:root {
+  --color-nav-inactive: #a8a29a;
+}
+
+.app-content {
+  flex: 1;
+  padding-bottom: 76px;
+}
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  background: var(--color-base);
+  border-top: 1px solid rgba(38, 5, 3, 0.1);
+  padding: 10px 0;
+  z-index: 10;
+}
+
+.bottom-nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  text-decoration: none;
+  color: var(--color-nav-inactive);
+}
+
+.bottom-nav-item .ti {
+  font-size: 16px;
+}
+
+.bottom-nav-item span {
+  font-size: 9px;
+}
+
+.bottom-nav-item.active {
+  color: var(--color-primary);
+}
+
+.bottom-nav-item.active span {
+  font-weight: 600;
+}

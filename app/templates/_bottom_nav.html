@@ -1,0 +1,13 @@
+{% set nav_items = [
+  ('/', 'ti-home', 'My Cache'),
+  ('/sell', 'ti-tag', 'Sell'),
+  ('/profile', 'ti-user', 'Profile')
+] %}
+<nav class="bottom-nav">
+  {% for path, icon, label in nav_items %}
+  <a href="{{ path }}" class="bottom-nav-item{{ ' active' if request.path == path else '' }}">
+    <i class="ti {{ icon }}"></i>
+    <span>{{ label }}</span>
+  </a>
+  {% endfor %}
+</nav>

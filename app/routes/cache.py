@@ -1,8 +1,9 @@
 """Temporary placeholder for the See Cache dashboard (Build Spec Section 10,
-Step 5). Exists now only so /register and /login have a real redirect target
-to verify the auth flow end-to-end; gets replaced with the real dashboard."""
-from flask import Blueprint
-from flask_login import current_user, login_required
+Step 5). Exists now only so /register and /login have a real redirect target,
+and so the bottom nav (Step 4) can be verified before the real dashboard
+content is built."""
+from flask import Blueprint, render_template
+from flask_login import login_required
 
 cache_bp = Blueprint("cache", __name__)
 
@@ -10,10 +11,4 @@ cache_bp = Blueprint("cache", __name__)
 @cache_bp.route("/")
 @login_required
 def dashboard():
-    return f"""
-    <p style="font-family:sans-serif;padding:24px;">
-      Logged in as {current_user.phone_number}.
-      <br>Dashboard is built in Step 5.
-      <br><a href="/logout">Log out</a>
-    </p>
-    """
+    return render_template("cache/dashboard_stub.html")
