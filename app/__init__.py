@@ -22,7 +22,11 @@ def create_app(config_class=Config):
     from app import models  # noqa: F401  registers model classes with SQLAlchemy metadata
 
     from app.routes.health import health_bp
+    from app.routes.auth import auth_bp
+    from app.routes.cache import cache_bp
 
     app.register_blueprint(health_bp)
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(cache_bp)
 
     return app

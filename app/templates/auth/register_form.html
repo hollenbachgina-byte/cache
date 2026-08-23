@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Create your Cache{% endblock %}
+{% block content %}
+<div class="header-bar">
+  <a href="{{ url_for('auth.register') }}" class="back-link"><i class="ti ti-arrow-left"></i></a>
+  <span class="wordmark" style="font-size:14px;">cache</span>
+  <span style="width:16px;"></span>
+</div>
+<form method="post" action="{{ url_for('auth.register') }}" class="form-panel">
+  <p class="form-heading">Create your Cache</p>
+
+  <div class="field-group">
+    <label class="field-label" for="phone_number">Phone number</label>
+    <input
+      type="tel"
+      id="phone_number"
+      name="phone_number"
+      class="field-input{{ ' has-error' if errors and errors.phone_number }}"
+      placeholder="(555) 123-4567"
+      value="{{ phone_number or '' }}"
+      required
+    >
+    {% if errors and errors.phone_number %}
+    <p class="error-message"><i class="ti ti-alert-circle"></i>{{ errors.phone_number }}</p>
+    {% endif %}
+  </div>
+
+  <div class="field-group">
+    <label class="field-label" for="password">Password</label>
+    <input
+      type="password"
+      id="password"
+      name="password"
+      class="field-input{{ ' has-error' if errors and errors.password }}"
+      placeholder="••••••••"
+      required
+    >
+    {% if errors and errors.password %}
+    <p class="error-message"><i class="ti ti-alert-circle"></i>{{ errors.password }}</p>
+    {% endif %}
+  </div>
+
+  <div class="field-group" style="margin-bottom:18px;">
+    <label class="field-label" for="confirm_password">Confirm password</label>
+    <input
+      type="password"
+      id="confirm_password"
+      name="confirm_password"
+      class="field-input{{ ' has-error' if errors and errors.confirm_password }}"
+      placeholder="••••••••"
+      required
+    >
+    {% if errors and errors.confirm_password %}
+    <p class="error-message"><i class="ti ti-alert-circle"></i>{{ errors.confirm_password }}</p>
+    {% endif %}
+  </div>
+
+  <button type="submit" class="btn-primary">Create my Cache</button>
+</form>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Your Cache is ready{% endblock %}
+{% block content %}
+<div class="success-screen">
+  <div class="success-icon"><i class="ti ti-check"></i></div>
+  <p style="font-size:16px; font-weight:600; margin:0 0 8px;">Your Cache is ready</p>
+  <p style="font-size:12px; color:var(--color-muted); margin:0 0 24px;">Start adding what you own.</p>
+  <a href="{{ url_for('cache.dashboard') }}" class="btn-primary">See my Cache</a>
+</div>
+{% endblock %}
