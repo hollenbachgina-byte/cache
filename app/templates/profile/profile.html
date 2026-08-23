@@ -23,15 +23,21 @@
     </form>
   </div>
 
-  <form method="post" action="{{ url_for('profile.update_name') }}" class="profile-name-form">
-    <input type="text" name="name" class="profile-name-input" value="{{ current_user.name or '' }}" placeholder="Add your name">
+  <div class="profile-name-display" data-name-display>
+    <span class="profile-name-text">{{ current_user.name or "Add your name" }}</span>
+    <button type="button" class="profile-name-edit-icon" data-toggle-name-edit aria-label="Edit name">
+      <i class="ti ti-pencil"></i>
+    </button>
+  </div>
+  <form method="post" action="{{ url_for('profile.update_name') }}" class="profile-name-form" data-name-edit-form style="display:none;">
+    <input type="text" name="name" class="profile-name-input" value="{{ current_user.name or '' }}" placeholder="Add your name" autofocus>
     <button type="submit" class="profile-name-save">Save</button>
   </form>
-  <p class="profile-caching-since">Caching since {{ current_user.created_at.strftime('%b %Y') }}</p>
+  <p class="profile-caching-since"><span class="wordmark-inline">cache</span>-ing since {{ current_user.created_at.strftime('%b %Y') }}</p>
 
   <div class="cache-value-card">
+    <div class="cache-value-amount">${{ '{:,.2f}'.format(cache_value) }}</div>
     <span>CACHE VALUE</span>
-    <div>${{ '{:,.2f}'.format(cache_value) }}</div>
   </div>
 
   <div class="collections-section">
@@ -72,6 +78,17 @@
     if (toggle && panel) {
       toggle.addEventListener("click", function () {
         panel.classList.toggle("open");
+      });
+    }
+
+    var nameDisplay = document.querySelector("[data-name-display]");
+    var nameEditToggle = document.querySelector("[data-toggle-name-edit]");
+    var nameEditForm = document.querySelector("[data-name-edit-form]");
+    if (nameEditToggle && nameDisplay && nameEditForm) {
+      nameEditToggle.addEventListener("click", function () {
+        nameDisplay.style.display = "none";
+        nameEditForm.style.display = "flex";
+        nameEditForm.querySelector("input").focus();
       });
     }
   });

@@ -855,15 +855,40 @@ textarea.field-input {
   color: #fff;
 }
 
+.profile-name-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.profile-name-text {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.profile-name-edit-icon {
+  background: none;
+  border: none;
+  color: var(--color-muted);
+  font-size: 11px;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
 .profile-name-form {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
-  margin-bottom: 2px;
+  width: 100%;
 }
 
 .profile-name-input {
   border: none;
+  border-bottom: 1px solid var(--color-secondary);
   background: none;
   font-size: 14px;
   font-weight: 600;
@@ -876,7 +901,6 @@ textarea.field-input {
 
 .profile-name-input:focus {
   outline: none;
-  border-bottom: 1px solid var(--color-secondary);
 }
 
 .profile-name-save {
@@ -889,6 +913,11 @@ textarea.field-input {
   font-family: var(--font-body);
 }
 
+.wordmark-inline {
+  font-family: var(--font-wordmark);
+  font-weight: 900;
+}
+
 .profile-caching-since {
   font-size: 10px;
   color: var(--color-muted);
@@ -896,20 +925,24 @@ textarea.field-input {
 }
 
 .cache-value-card {
-  margin: 14px 18px;
+  width: 100%;
+  margin: 14px 0;
   background: #fff;
   border-radius: 10px;
-  padding: 12px;
+  padding: 14px;
   text-align: center;
 }
 
 .cache-value-card span {
+  display: block;
   font-size: 9px;
   color: var(--color-muted);
+  letter-spacing: 0.05em;
+  margin-top: 4px;
 }
 
-.cache-value-card div {
-  font-size: 18px;
+.cache-value-amount {
+  font-size: 24px;
   font-weight: 700;
   color: var(--color-primary);
 }
