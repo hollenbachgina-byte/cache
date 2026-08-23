@@ -24,9 +24,11 @@ def create_app(config_class=Config):
     from app.routes.health import health_bp
     from app.routes.auth import auth_bp
     from app.routes.cache import cache_bp
+    from app.routes.items import items_bp
 
     app.register_blueprint(health_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(cache_bp)
+    app.register_blueprint(items_bp)
 
     return app

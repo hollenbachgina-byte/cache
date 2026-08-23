@@ -17,3 +17,7 @@ class Config:
     SUPABASE_URL = os.environ.get("SUPABASE_URL")
     SUPABASE_SERVICE_KEY = os.environ.get("SUPABASE_SERVICE_KEY")
     SUPABASE_STORAGE_BUCKET = os.environ.get("SUPABASE_STORAGE_BUCKET", "item-photos")
+
+    # Client already compresses photos to ~1200px/JPEG q0.7 before upload; this
+    # just caps how large an unexpected/uncompressed request body can be.
+    MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16 MB

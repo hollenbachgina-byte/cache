@@ -462,3 +462,135 @@ body {
   color: var(--color-muted);
   margin: 0;
 }
+
+/* Add item */
+.form-panel-relative {
+  position: relative;
+  padding: 16px 18px;
+}
+
+.photo-dropzone {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  background: #fff;
+  border: 2px dashed rgba(38, 5, 3, 0.2);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 14px;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.photo-dropzone.has-error {
+  border-color: var(--color-error);
+}
+
+.photo-dropzone .ti {
+  font-size: 22px;
+  color: var(--color-muted);
+}
+
+.photo-dropzone span {
+  font-size: 10px;
+  color: var(--color-muted);
+}
+
+.photo-dropzone img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: none;
+}
+
+.photo-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  overflow: hidden;
+}
+
+.field-row {
+  display: flex;
+  gap: 8px;
+}
+
+.field-row .field-group {
+  flex: 1;
+}
+
+textarea.field-input {
+  min-height: 64px;
+  padding: 8px 12px;
+  resize: vertical;
+}
+
+.uploading-overlay {
+  display: none;
+  position: absolute;
+  inset: 0;
+  background: var(--color-base);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  z-index: 5;
+}
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid rgba(201, 27, 70, 0.2);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  margin: 0 auto 16px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.uploading-text {
+  font-size: 12px;
+  color: var(--color-muted);
+}
+
+/* Add-item success */
+.success-total {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: 2px;
+}
+
+.success-delta {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-accent);
+  margin-bottom: 22px;
+  visibility: hidden;
+}
+
+.btn-secondary {
+  width: 100%;
+  height: 42px;
+  background: var(--color-secondary);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--font-body);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
