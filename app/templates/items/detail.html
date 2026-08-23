@@ -1,0 +1,93 @@
+{% extends "app_base.html" %}
+{% block title %}{{ item.name }}{% endblock %}
+{% block app_content %}
+<div class="header-bar">
+  <a href="{{ url_for('cache.dashboard') }}" class="back-link"><i class="ti ti-arrow-left"></i></a>
+  <span class="wordmark" style="font-size:13px;">cache</span>
+  <div class="item-menu-wrap">
+    <button type="button" class="item-menu-toggle" data-item-menu-toggle aria-label="Item options">
+      <i class="ti ti-dots-vertical"></i>
+    </button>
+    <div class="item-menu-panel" data-item-menu-panel>
+      <button type="button" class="item-menu-delete" data-open-delete-modal>
+        <i class="ti ti-trash"></i>
+        <span>Delete item</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="item-photo-full" style="background-image:url('{{ item.photo_url }}');"></div>
+
+<div class="item-detail-body">
+  <p class="item-detail-name">{{ item.name }}</p>
+  <p class="item-detail-meta">
+    {%- if item.brand %}{{ item.brand }} · {% endif -%}
+    Added {{ item.created_at.strftime('%b %-d') }}
+  </p>
+
+  <div class="item-stats-row">
+    <div>
+      <p class="item-stat-label">PURCHASE</p>
+      <p class="item-stat-value">${{ '{:,.0f}'.format(item.price_purchased) }}</p>
+    </div>
+    <div>
+      <p class="item-stat-label">RESALE EST.</p>
+      <p class="item-stat-value resale">${{ '{:,.0f}'.format(item.resale_value) }}</p>
+    </div>
+  </div>
+
+  {% if item.description %}
+  <p class="item-detail-description">{{ item.description }}</p>
+  {% endif %}
+
+  <span class="category-tag">{{ item.category }}</span>
+</div>
+
+<div class="modal-overlay" data-delete-modal>
+  <div class="modal-card">
+    <div class="modal-icon-circle"><i class="ti ti-trash"></i></div>
+    <p class="modal-title">Delete this item?</p>
+    <p class="modal-body">This can't be undone.</p>
+    <form method="post" action="{{ url_for('items.delete_item', item_id=item.id) }}">
+      <button type="submit" class="btn-danger">Delete item</button>
+    </form>
+    <button type="button" class="btn-outline" data-close-delete-modal>Cancel</button>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var menuToggle = document.querySelector("[data-item-menu-toggle]");
+    var menuPanel = document.querySelector("[data-item-menu-panel]");
+    var openModalBtn = document.querySelector("[data-open-delete-modal]");
+    var closeModalBtn = document.querySelector("[data-close-delete-modal]");
+    var modal = document.querySelector("[data-delete-modal]");
+
+    if (menuToggle && menuPanel) {
+      menuToggle.addEventListener("click", function () {
+        menuPanel.classList.toggle("open");
+      });
+      document.addEventListener("click", function (event) {
+        if (!menuPanel.contains(event.target) && !menuToggle.contains(event.target)) {
+          menuPanel.classList.remove("open");
+        }
+      });
+    }
+
+    if (openModalBtn && modal) {
+      openModalBtn.addEventListener("click", function () {
+        menuPanel.classList.remove("open");
+        modal.classList.add("open");
+      });
+    }
+    if (closeModalBtn && modal) {
+      closeModalBtn.addEventListener("click", function () {
+        modal.classList.remove("open");
+      });
+    }
+  });
+</script>
+{% endblock %}

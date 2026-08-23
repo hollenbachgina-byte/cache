@@ -1,12 +1,12 @@
 from datetime import datetime
 from decimal import Decimal, InvalidOperation
 
-from flask import Blueprint, render_template, request
+from flask import Blueprint, abort, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
 from app import db
 from app.models import Item
-from app.services.storage import PhotoUploadError, upload_item_photo
+from app.services.storage import PhotoUploadError, delete_item_photo, upload_item_photo
 
 items_bp = Blueprint("items", __name__)
 
@@ -128,3 +128,30 @@ def add_item():
         new_total=new_total,
         delta=delta,
     )
+
+
+def _get_owned_item_or_404(item_id):
+    item = Item.query.get_or_404(item_id)
+    if item.user_id != current_user.id:
+        # 404, not 403 — don't reveal that another user's item exists at all.
+        abort(404)
+    return item
+
+
+@items_bp.route("/item/<int:item_id>")
+@login_required
+def item_detail(item_id):
+    item = _get_owned_item_or_404(item_id)
+    return render_template("items/detail.html", item=item)
+
+
+@items_bp.route("/item/<int:item_id>/delete", methods=["POST"])
+@login_required
+def delete_item(item_id):
+    item = _get_owned_item_or_404(item_id)
+
+    delete_item_photo(item.photo_url)
+    db.session.delete(item)
+    db.session.commit()
+
+    return redirect(url_for("cache.dashboard"))
