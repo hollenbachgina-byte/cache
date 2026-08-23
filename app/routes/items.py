@@ -10,12 +10,41 @@ from app.services.storage import PhotoUploadError, upload_item_photo
 
 items_bp = Blueprint("items", __name__)
 
+PRESET_CATEGORIES = [
+    "Watches",
+    "Bags",
+    "Shoes",
+    "Clothing",
+    "Accessories",
+    "Jewelry",
+    "Electronics",
+    "Home",
+    "Other",
+]
+
+
+def get_suggested_categories(user_id):
+    """Preset categories first (curated order), then any categories this
+    user has already used that aren't already in the preset list."""
+    user_categories = sorted(
+        row[0]
+        for row in db.session.query(Item.category)
+        .filter_by(user_id=user_id)
+        .distinct()
+        .all()
+    )
+    extra = [c for c in user_categories if c not in PRESET_CATEGORIES]
+    return PRESET_CATEGORIES + extra
+
 
 @items_bp.route("/add", methods=["GET", "POST"])
 @login_required
 def add_item():
     if request.method == "GET":
-        return render_template("items/add.html")
+        return render_template(
+            "items/add.html",
+            suggested_categories=get_suggested_categories(current_user.id),
+        )
 
     form = request.form
     name = form.get("name", "").strip()
@@ -58,13 +87,21 @@ def add_item():
         errors["photo"] = "Add a photo."
 
     if errors:
-        return render_template("items/add.html", errors=errors, form=form), 400
+        return render_template(
+            "items/add.html",
+            errors=errors,
+            form=form,
+            suggested_categories=get_suggested_categories(current_user.id),
+        ), 400
 
     try:
         photo_url = upload_item_photo(photo, current_user.id)
     except PhotoUploadError as exc:
         return render_template(
-            "items/add.html", errors={"photo": str(exc)}, form=form
+            "items/add.html",
+            errors={"photo": str(exc)},
+            form=form,
+            suggested_categories=get_suggested_categories(current_user.id),
         ), 400
 
     item = Item(

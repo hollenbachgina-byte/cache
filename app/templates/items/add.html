@@ -61,11 +61,18 @@
           type="text"
           id="category"
           name="category"
+          list="category-suggestions"
           class="field-input{{ ' has-error' if errors and errors.category }}"
           placeholder="Watches"
           value="{{ form.category if form else '' }}"
+          autocomplete="off"
           required
         >
+        <datalist id="category-suggestions">
+          {% for c in suggested_categories %}
+          <option value="{{ c }}">
+          {% endfor %}
+        </datalist>
         {% if errors and errors.category %}
         <p class="error-message"><i class="ti ti-alert-circle"></i>{{ errors.category }}</p>
         {% endif %}
