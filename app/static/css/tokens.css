@@ -17,7 +17,11 @@
 body {
   margin: 0;
   font-family: var(--font-body);
-  background: var(--color-base);
+  /* Neutral outer canvas — only visible around the app card on viewports
+     wider than 480px. On mobile the app-shell fills the viewport, so this
+     never shows; on desktop it gives the card a clear edge instead of
+     blending into an identically-colored infinite background. */
+  background: #f0f0f0;
   color: var(--color-text);
 }
 
@@ -29,6 +33,7 @@ body {
   position: relative;
   display: flex;
   flex-direction: column;
+  box-shadow: 0 0 40px rgba(38, 5, 3, 0.08);
 }
 
 .wordmark {
@@ -188,6 +193,8 @@ body {
 
 .app-content {
   flex: 1;
+  display: flex;
+  flex-direction: column;
   padding-bottom: 76px;
 }
 
