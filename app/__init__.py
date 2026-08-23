@@ -37,4 +37,8 @@ def create_app(config_class=Config):
     app.register_blueprint(collections_bp)
     app.register_blueprint(sell_bp)
 
+    from app.admin import init_admin
+
+    init_admin(app, db)
+
     return app
