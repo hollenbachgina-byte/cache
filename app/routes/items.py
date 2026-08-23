@@ -24,17 +24,16 @@ PRESET_CATEGORIES = [
 
 
 def get_suggested_categories(user_id):
-    """Preset categories first (curated order), then any categories this
-    user has already used that aren't already in the preset list."""
-    user_categories = sorted(
+    """Preset categories plus anything this user has already used, merged
+    into one alphabetized list."""
+    user_categories = {
         row[0]
         for row in db.session.query(Item.category)
         .filter_by(user_id=user_id)
         .distinct()
         .all()
-    )
-    extra = [c for c in user_categories if c not in PRESET_CATEGORIES]
-    return PRESET_CATEGORIES + extra
+    }
+    return sorted(set(PRESET_CATEGORIES) | user_categories)
 
 
 @items_bp.route("/add", methods=["GET", "POST"])
