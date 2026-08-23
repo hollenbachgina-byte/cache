@@ -17,7 +17,13 @@ class User(UserMixin, db.Model):
     profile_photo_url = db.Column(db.String(512), nullable=True)
 
     items = db.relationship("Item", backref="user", lazy=True, cascade="all, delete-orphan")
-    collections = db.relationship("Collection", backref="user", lazy=True, cascade="all, delete-orphan")
+    collections = db.relationship(
+        "Collection",
+        backref="user",
+        lazy=True,
+        cascade="all, delete-orphan",
+        order_by="Collection.created_at.desc()",
+    )
 
     def __repr__(self):
         return f"<User {self.id} {self.phone_number}>"
