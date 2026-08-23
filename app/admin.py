@@ -3,7 +3,7 @@ built-in access control, and the data model has no is_admin flag, so every
 view here is gated behind HTTP Basic Auth (ADMIN_USERNAME/ADMIN_PASSWORD)
 rather than left open or expanding the schema for a single-admin project."""
 from flask import Response, current_app, request
-from flask_admin import Admin
+from flask_admin import Admin, AdminIndexView
 from flask_admin.contrib.sqla import ModelView
 from flask_admin.theme import Bootstrap4Theme
 
@@ -17,7 +17,7 @@ def _check_admin_auth(auth):
     return auth.username == current_app.config.get("ADMIN_USERNAME") and auth.password == password
 
 
-class SecureModelView(ModelView):
+class SecureAdminMixin:
     def is_accessible(self):
         return _check_admin_auth(request.authorization)
 
@@ -27,6 +27,16 @@ class SecureModelView(ModelView):
             401,
             {"WWW-Authenticate": 'Basic realm="cache admin"'},
         )
+
+
+class SecureModelView(SecureAdminMixin, ModelView):
+    pass
+
+
+class SecureAdminIndexView(SecureAdminMixin, AdminIndexView):
+    """Flask-Admin's root /admin/ page is a separate view class from
+    ModelView — easy to protect every data view and still leave this shell
+    page open by mistake, so it gets the exact same auth check."""
 
 
 class UserAdmin(SecureModelView):
@@ -49,7 +59,12 @@ class CollectionAdmin(SecureModelView):
 
 
 def init_admin(app, db):
-    admin = Admin(app, name="cache admin", theme=Bootstrap4Theme())
+    admin = Admin(
+        app,
+        name="cache admin",
+        theme=Bootstrap4Theme(),
+        index_view=SecureAdminIndexView(),
+    )
     admin.add_view(UserAdmin(User, db.session))
     admin.add_view(ItemAdmin(Item, db.session))
     admin.add_view(ResaleRateAdmin(ResaleRate, db.session))
