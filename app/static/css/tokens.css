@@ -1078,3 +1078,52 @@ textarea.field-input {
 .add-items-controls .field-input {
   flex: 1;
 }
+
+/* Sell stub — deliberately muted/washed-out palette, distinct from the
+   6 main brand tokens, matching the mockup's "disabled" treatment. */
+.sell-stub {
+  background: #f2ede4;
+  color: #9c968a;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.sell-stub-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  border-bottom: 1px solid rgba(38, 5, 3, 0.06);
+}
+
+.sell-stub-header span {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.sell-stub-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 60px 24px;
+}
+
+.sell-stub-body .ti {
+  font-size: 26px;
+  color: #c7bfae;
+}
+
+.coming-soon-tag {
+  margin-top: 14px;
+  padding: 5px 12px;
+  background: #e3d9c9;
+  color: #8a8171;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 600;
+}
