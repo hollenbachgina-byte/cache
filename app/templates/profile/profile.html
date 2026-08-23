@@ -49,8 +49,9 @@
     </div>
 
     <div class="create-collection-panel" data-create-collection-panel>
-      <form method="post" action="{{ url_for('collections.create_collection') }}" style="display:flex; gap:6px; width:100%;">
+      <form method="post" action="{{ url_for('collections.create_collection') }}" class="create-collection-form">
         <input type="text" name="name" placeholder="Collection name" required>
+        <textarea name="description" placeholder="Add a short description (optional)"></textarea>
         <button type="submit">Create</button>
       </form>
     </div>

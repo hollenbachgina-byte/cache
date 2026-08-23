@@ -1007,24 +1007,37 @@ textarea.field-input {
   border-radius: 10px;
   padding: 10px;
   margin-bottom: 10px;
-  gap: 6px;
 }
 
 .create-collection-panel.open {
-  display: flex;
+  display: block;
 }
 
-.create-collection-panel input {
-  flex: 1;
-  height: 32px;
+.create-collection-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.create-collection-form input,
+.create-collection-form textarea {
   border: 1px solid rgba(38, 5, 3, 0.2);
   border-radius: 6px;
-  padding: 0 10px;
+  padding: 6px 10px;
   font-size: 11px;
   font-family: var(--font-body);
 }
 
-.create-collection-panel button {
+.create-collection-form input {
+  height: 32px;
+}
+
+.create-collection-form textarea {
+  min-height: 44px;
+  resize: vertical;
+}
+
+.create-collection-form button {
   height: 32px;
   padding: 0 12px;
   background: var(--color-primary);
@@ -1044,13 +1057,115 @@ textarea.field-input {
 }
 
 /* Collection detail */
+.collection-description {
+  font-size: 11px;
+  color: var(--color-muted);
+  padding: 8px 18px 0;
+  margin: 0;
+}
+
 .collection-item-card {
   background: #fff;
   border-radius: 10px;
   padding: 8px;
-  text-decoration: none;
   color: var(--color-text);
+}
+
+.collection-item-card a {
+  text-decoration: none;
+  color: inherit;
   display: block;
+}
+
+.asking-price-display {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+}
+
+.asking-price-display span {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.price-edit-icon {
+  background: none;
+  border: none;
+  color: var(--color-muted);
+  font-size: 10px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.asking-price-form {
+  display: flex;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.asking-price-form input {
+  flex: 1;
+  width: 0;
+  height: 26px;
+  border: 1px solid rgba(38, 5, 3, 0.2);
+  border-radius: 6px;
+  padding: 0 6px;
+  font-size: 10px;
+  font-family: var(--font-body);
+}
+
+.asking-price-form button {
+  height: 26px;
+  padding: 0 8px;
+  background: var(--color-secondary);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 9px;
+  font-weight: 600;
+  font-family: var(--font-body);
+  cursor: pointer;
+}
+
+.share-url-box {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.share-url-box input {
+  flex: 1;
+  width: 0;
+  height: 34px;
+  border: 1px solid rgba(38, 5, 3, 0.2);
+  border-radius: 6px;
+  padding: 0 8px;
+  font-size: 10px;
+  font-family: var(--font-body);
+  color: var(--color-text);
+  background: #fff;
+}
+
+.share-url-box button {
+  height: 34px;
+  width: 34px;
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.share-copied-note {
+  font-size: 10px;
+  color: var(--color-secondary);
+  font-weight: 600;
+  margin: 0;
 }
 
 .add-items-picker {
@@ -1133,4 +1248,80 @@ textarea.field-input {
   border-radius: 999px;
   font-size: 10px;
   font-weight: 600;
+}
+
+/* Public shared collection page */
+.public-collection {
+  padding: 32px 18px 48px;
+  flex: 1;
+}
+
+.public-owner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.public-owner-avatar {
+  width: 56px;
+  height: 56px;
+  margin-bottom: 8px;
+}
+
+.public-owner-name {
+  font-size: 12px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.public-collection-name {
+  font-size: 20px;
+  font-weight: 700;
+  text-align: center;
+  margin: 0 0 6px;
+}
+
+.public-collection-description {
+  font-size: 12px;
+  color: var(--color-muted);
+  text-align: center;
+  margin: 0 0 20px;
+}
+
+.public-item-grid {
+  padding: 0;
+  margin-top: 20px;
+}
+
+.public-item-prices {
+  margin-top: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.public-item-paid {
+  font-size: 10px;
+  color: var(--color-text);
+}
+
+.public-item-asking {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.public-empty {
+  text-align: center;
+  font-size: 12px;
+  color: var(--color-muted);
+  margin-top: 40px;
+}
+
+.public-footer {
+  text-align: center;
+  font-size: 10px;
+  color: var(--color-muted);
+  margin-top: 40px;
 }

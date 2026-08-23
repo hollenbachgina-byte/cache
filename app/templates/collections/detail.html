@@ -4,18 +4,45 @@
 <div class="header-bar">
   <a href="{{ url_for('profile.profile') }}" class="back-link"><i class="ti ti-arrow-left"></i></a>
   <span style="font-size:13px; font-weight:600;">{{ collection.name }}</span>
-  <button type="button" class="back-link" data-toggle-add-items aria-label="Add items" style="background:none; border:none; cursor:pointer;">
-    <i class="ti ti-plus"></i>
-  </button>
+  <div style="display:flex; gap:12px; align-items:center;">
+    <button type="button" class="back-link" data-open-share-modal aria-label="Share" style="background:none; border:none; cursor:pointer;">
+      <i class="ti ti-share"></i>
+    </button>
+    <button type="button" class="back-link" data-toggle-add-items aria-label="Add items" style="background:none; border:none; cursor:pointer;">
+      <i class="ti ti-plus"></i>
+    </button>
+  </div>
 </div>
 
-{% if items %}
+{% if collection.description %}
+<p class="collection-description">{{ collection.description }}</p>
+{% endif %}
+
+{% if collection.collection_items %}
 <div class="item-grid">
-  {% for item in items %}
-  <a href="/item/{{ item.id }}" class="collection-item-card">
-    <div class="item-card-photo" style="background-image:url('{{ item.photo_url }}');"></div>
-    <p class="item-card-name">{{ item.name }}</p>
-  </a>
+  {% for ci in collection.collection_items %}
+  <div class="collection-item-card">
+    <a href="/item/{{ ci.item.id }}">
+      <div class="item-card-photo" style="background-image:url('{{ ci.item.photo_url }}');"></div>
+      <p class="item-card-name">{{ ci.item.name }}</p>
+    </a>
+    <div class="asking-price-display" data-price-display="{{ ci.item_id }}">
+      <span>${{ '{:,.0f}'.format(ci.effective_price) }}</span>
+      <button type="button" class="price-edit-icon" data-toggle-price-edit="{{ ci.item_id }}" aria-label="Edit asking price">
+        <i class="ti ti-pencil"></i>
+      </button>
+    </div>
+    <form
+      method="post"
+      action="{{ url_for('collections.update_asking_price', collection_id=collection.id, item_id=ci.item_id) }}"
+      class="asking-price-form"
+      data-price-form="{{ ci.item_id }}"
+      style="display:none;"
+    >
+      <input type="number" name="asking_price" step="0.01" min="0" value="{{ ci.asking_price if ci.asking_price is not none else '' }}" placeholder="{{ '{:,.0f}'.format(ci.item.resale_value) }}">
+      <button type="submit">Save</button>
+    </form>
+  </div>
   {% endfor %}
 </div>
 {% else %}
@@ -66,6 +93,19 @@
   {% else %}
   <p class="empty-collections">All your items are already in this collection.</p>
   {% endif %}
+</div>
+
+<div class="modal-overlay" data-share-modal{{ ' style=display:flex;' if just_created }}>
+  <div class="modal-card">
+    <p class="modal-title">Success! Here's your new collection link</p>
+    <p class="modal-body">Share wherever you want.</p>
+    <div class="share-url-box">
+      <input type="text" value="{{ share_url }}" readonly data-share-url-input>
+      <button type="button" data-copy-share-url aria-label="Copy link"><i class="ti ti-copy"></i></button>
+    </div>
+    <p class="share-copied-note" data-copied-note style="visibility:hidden;">Copied!</p>
+    <button type="button" class="btn-outline" data-close-share-modal style="margin-top:12px;">Close</button>
+  </div>
 </div>
 {% endblock %}
 
@@ -142,6 +182,56 @@
         categoryCheckboxes.forEach(function (cb) { cb.checked = false; });
         applyFilters();
         filtersPanel.classList.remove("open");
+      });
+    }
+
+    // Per-item asking-price inline edit toggle
+    document.querySelectorAll("[data-toggle-price-edit]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var itemId = btn.getAttribute("data-toggle-price-edit");
+        var display = document.querySelector('[data-price-display="' + itemId + '"]');
+        var form = document.querySelector('[data-price-form="' + itemId + '"]');
+        if (display) display.style.display = "none";
+        if (form) {
+          form.style.display = "flex";
+          var input = form.querySelector("input");
+          if (input) input.focus();
+        }
+      });
+    });
+
+    // Share modal
+    var shareModal = document.querySelector("[data-share-modal]");
+    var openShareBtn = document.querySelector("[data-open-share-modal]");
+    var closeShareBtn = document.querySelector("[data-close-share-modal]");
+    if (openShareBtn && shareModal) {
+      openShareBtn.addEventListener("click", function () {
+        shareModal.classList.add("open");
+        shareModal.style.display = "flex";
+      });
+    }
+    if (closeShareBtn && shareModal) {
+      closeShareBtn.addEventListener("click", function () {
+        shareModal.classList.remove("open");
+        shareModal.style.display = "none";
+      });
+    }
+
+    var copyBtn = document.querySelector("[data-copy-share-url]");
+    var shareInput = document.querySelector("[data-share-url-input]");
+    var copiedNote = document.querySelector("[data-copied-note]");
+    if (copyBtn && shareInput) {
+      copyBtn.addEventListener("click", function () {
+        shareInput.select();
+        shareInput.setSelectionRange(0, 99999);
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(shareInput.value).then(function () {
+            if (copiedNote) copiedNote.style.visibility = "visible";
+          });
+        } else {
+          document.execCommand("copy");
+          if (copiedNote) copiedNote.style.visibility = "visible";
+        }
       });
     }
   });

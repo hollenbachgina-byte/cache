@@ -84,11 +84,16 @@ run.py
 - `id` (PK)
 - `user_id` (FK → User)
 - `name` (string)
+- `description` (text, nullable — added when collection sharing was pulled into scope, see note below)
+- `share_token` (string, unique, indexed, random — the public share URL is `/c/<share_token>`, never `/collections/<id>`. Collection ids are sequential/guessable; if the public link used the id directly, anyone could enumerate every user's collections once a single one was shared. `share_token` is the only way in.)
 - `created_at` (datetime, default now)
 
 **CollectionItem** (join table, many-to-many)
 - `collection_id` (FK → Collection)
 - `item_id` (FK → Item)
+- `asking_price` (decimal, nullable — owner-editable override shown on the public share page in place of the computed `resale_value`. Falls back to `Item.resale_value` when unset. Scoped to the join row, not the Item itself, so the same item can carry a different asking price in different collections without touching its canonical resale math.)
+
+**Note — collection sharing pulled forward from Phase 2:** originally Section 9 listed "collection sharing links" as explicitly out of scope. Gina asked for it mid-build (public link with a "Success!" popup + copy button on creation, owner name/photo + collection name + description + items with purchase/asking price on the public page). Implemented as `GET /c/<share_token>` — public, no login required, looked up only by the random token above.
 
 **Resale value calculation (not stored):** for a given item, `resale_value = item.price_purchased * ResaleRate.multiplier` where the multiplier is looked up by `item.category`, falling back to the `default` row if no match exists. Compute this at render time everywhere it's displayed (item cards, item detail, total cache value, success screen) — never persist it, so admin changes to `ResaleRate` apply retroactively with no recompute job.
 
@@ -106,9 +111,11 @@ run.py
 | GET | `/item/<id>` | Yes, owner only | Item detail — both purchase price and computed resale value shown |
 | POST | `/item/<id>/delete` | Yes, owner only | Delete after confirmation modal, redirect to `/` |
 | GET | `/profile` | Yes | Profile picture (placeholder icon), name, "Caching since [date]", cache value, My Collections list |
-| POST | `/collections` | Yes | Create a named collection |
-| GET | `/collections/<id>` | Yes, owner only | View items in a collection |
+| POST | `/collections` | Yes | Create a named collection with an optional description; redirects to its detail page with `?created=1` to trigger the share-link success modal |
+| GET | `/collections/<id>` | Yes, owner only | View/manage items in a collection, edit per-item asking price, reopen the share modal |
 | POST | `/collections/<id>/add_item` | Yes, owner only | Add an item to a collection (item can belong to multiple) |
+| POST | `/collections/<id>/item/<item_id>/price` | Yes, owner only | Set (or clear) that item's asking-price override for this collection |
+| GET | `/c/<share_token>` | **No** | Public shared-collection page — owner name/photo, collection name/description, items with purchase + asking price |
 | GET | `/sell` | Yes | Stub page — muted styling, "Coming soon" tag, no functionality |
 
 Any protected route hit while logged out redirects to `/login`.
@@ -178,7 +185,7 @@ Any protected route hit while logged out redirects to `/login`.
 - Auto-parse: @cache email alias, SendGrid Inbound Parse, LLM receipt extraction
 - Real listing creation / Sell flow functionality (the 5-screen flow is designed but not built — `/sell` is a stub only)
 - Stripe / C2C payments
-- Collection sharing links
+- ~~Collection sharing links~~ — pulled into scope mid-build; see the Collection model note in Section 4
 - Full onboarding carousel, profile form (name/DOB/gender), cache-email assignment screen, resale-account-linking screen
 - Real resale-value estimation (the flat category-multiplier via `ResaleRate` is the Phase 1 placeholder, by design)
 

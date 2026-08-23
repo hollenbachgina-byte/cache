@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}{{ collection.name }} — cache{% endblock %}
+{% block content %}
+<div class="public-collection">
+  <div class="public-owner">
+    <div class="avatar-circle public-owner-avatar">
+      {% if collection.user.profile_photo_url %}
+      <img src="{{ collection.user.profile_photo_url }}" alt="">
+      {% else %}
+      <i class="ti ti-user"></i>
+      {% endif %}
+    </div>
+    <p class="public-owner-name">{{ collection.user.name or "A cache user" }}</p>
+  </div>
+
+  <h1 class="public-collection-name">{{ collection.name }}</h1>
+  {% if collection.description %}
+  <p class="public-collection-description">{{ collection.description }}</p>
+  {% endif %}
+
+  {% if collection_items %}
+  <div class="item-grid public-item-grid">
+    {% for ci in collection_items %}
+    <div class="collection-item-card">
+      <div class="item-card-photo" style="background-image:url('{{ ci.item.photo_url }}');"></div>
+      <p class="item-card-name">{{ ci.item.name }}</p>
+      <div class="public-item-prices">
+        <span class="public-item-paid">Paid ${{ '{:,.0f}'.format(ci.item.price_purchased) }}</span>
+        <span class="public-item-asking">Asking ${{ '{:,.0f}'.format(ci.effective_price) }}</span>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="public-empty">Nothing in this collection yet.</p>
+  {% endif %}
+
+  <p class="public-footer">
+    Made with <span class="wordmark-inline">cache</span>
+  </p>
+</div>
+{% endblock %}
