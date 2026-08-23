@@ -19,6 +19,8 @@ def create_app(config_class=Config):
     migrate.init_app(app, db)
     login_manager.init_app(app)
 
+    from app import models  # noqa: F401  registers model classes with SQLAlchemy metadata
+
     from app.routes.health import health_bp
 
     app.register_blueprint(health_bp)
