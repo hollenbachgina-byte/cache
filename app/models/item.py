@@ -1,5 +1,6 @@
 import enum
 from datetime import datetime
+from decimal import ROUND_HALF_UP, Decimal
 
 from app import db
 
@@ -36,3 +37,13 @@ class Item(db.Model):
 
     def __repr__(self):
         return f"<Item {self.id} {self.name}>"
+
+    @property
+    def resale_value(self):
+        """Computed live, never persisted — a category's multiplier is looked
+        up (falling back to 'default') at every render, so admin changes to
+        ResaleRate apply retroactively with no recompute job."""
+        from app.models.resale_rate import ResaleRate
+
+        multiplier = Decimal(str(ResaleRate.multiplier_for(self.category)))
+        return (self.price_purchased * multiplier).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)

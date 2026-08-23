@@ -230,3 +230,235 @@ body {
 .bottom-nav-item.active span {
   font-weight: 600;
 }
+
+/* Dashboard */
+.dashboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px 0;
+}
+
+.dashboard-title {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.filters-wrap {
+  position: relative;
+}
+
+.filters-btn {
+  padding: 6px 10px;
+  background: #fff;
+  border: 1px solid var(--color-secondary);
+  color: var(--color-secondary);
+  border-radius: 999px;
+  font-size: 10px;
+  font-family: var(--font-body);
+  cursor: pointer;
+}
+
+.filters-btn.active {
+  background: var(--color-secondary);
+  color: #fff;
+  border: none;
+}
+
+.filters-panel {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  width: 180px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  z-index: 20;
+}
+
+.filters-panel.open {
+  display: block;
+}
+
+.filters-panel-body {
+  padding: 6px 14px;
+}
+
+.filter-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(38, 5, 3, 0.06);
+  font-size: 11px;
+  cursor: pointer;
+  position: relative;
+}
+
+.filter-checkbox:last-child {
+  border-bottom: none;
+}
+
+.filter-checkbox input {
+  position: absolute;
+  opacity: 0;
+  width: 15px;
+  height: 15px;
+  margin: 0;
+  cursor: pointer;
+}
+
+.checkbox-box {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  border-radius: 4px;
+  border: 1.5px solid #b0b0b0;
+  flex-shrink: 0;
+}
+
+.filter-checkbox input:checked + .checkbox-box {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.filters-actions {
+  padding: 8px 14px 12px;
+  display: flex;
+  gap: 6px;
+}
+
+.filters-actions .btn-clear {
+  flex: 1;
+  height: 32px;
+  background: #fff;
+  border: 1px solid rgba(38, 5, 3, 0.15);
+  border-radius: 6px;
+  font-size: 10px;
+  font-family: var(--font-body);
+  color: var(--color-text);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.filters-actions .btn-apply {
+  flex: 1;
+  height: 32px;
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  font-family: var(--font-body);
+  cursor: pointer;
+}
+
+.total-value-block {
+  padding: 12px 18px 0;
+}
+
+.total-value-label {
+  font-size: 9px;
+  color: var(--color-muted);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.total-value-amount {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-top: 2px;
+}
+
+.item-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 14px 18px;
+}
+
+.item-card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 8px;
+  text-decoration: none;
+  color: var(--color-text);
+  display: block;
+}
+
+.item-card-photo {
+  width: 100%;
+  aspect-ratio: 1;
+  background: #e3d9c9;
+  border-radius: 8px;
+  margin-bottom: 6px;
+  background-size: cover;
+  background-position: center;
+}
+
+.item-card-name {
+  font-size: 11px;
+  margin: 0;
+}
+
+.item-card-meta {
+  font-size: 10px;
+  color: var(--color-muted);
+  margin: 0;
+}
+
+.fab-add {
+  position: fixed;
+  bottom: 92px;
+  /* Stays inset 14px from the app-shell's own right edge (not the viewport's)
+     at any width: flush-right on phones (shell fills the viewport), correctly
+     offset inward once the shell is centered with margins on wider screens. */
+  right: max(14px, calc((100vw - 480px) / 2 + 14px));
+  width: 40px;
+  height: 40px;
+  background: var(--color-primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(201, 27, 70, 0.35);
+  z-index: 10;
+}
+
+.fab-add .ti {
+  font-size: 18px;
+}
+
+.empty-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 20px 30px;
+}
+
+.empty-state .ti {
+  font-size: 28px;
+  color: #c7b585;
+}
+
+.empty-state-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 12px 0 4px;
+}
+
+.empty-state-body {
+  font-size: 11px;
+  color: var(--color-muted);
+  margin: 0;
+}

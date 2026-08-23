@@ -13,3 +13,17 @@ class ResaleRate(db.Model):
 
     def __repr__(self):
         return f"<ResaleRate {self.category} x{self.multiplier}>"
+
+    # Hardcoded safety net matching this column's own spec'd default — only
+    # matters before Step 10 seeds a real "default" row via Flask-Admin.
+    FALLBACK_MULTIPLIER = 0.60
+
+    @staticmethod
+    def multiplier_for(category):
+        rate = ResaleRate.query.filter_by(category=category).first()
+        if rate:
+            return rate.multiplier
+        default_rate = ResaleRate.query.filter_by(category="default").first()
+        if default_rate:
+            return default_rate.multiplier
+        return ResaleRate.FALLBACK_MULTIPLIER

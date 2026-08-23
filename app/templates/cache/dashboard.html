@@ -1,0 +1,69 @@
+{% extends "app_base.html" %}
+{% block title %}My Cache{% endblock %}
+{% block app_content %}
+<div class="dashboard-header">
+  <span class="dashboard-title">My Cache</span>
+  <div class="filters-wrap">
+    <button type="button" class="filters-btn{{ ' active' if selected_categories }}" data-filters-toggle>
+      Filters{{ ' (' ~ selected_categories|length ~ ')' if selected_categories }} ▾
+    </button>
+    <div class="filters-panel" data-filters-panel>
+      <form method="get" action="{{ url_for('cache.dashboard') }}">
+        <div class="filters-panel-body">
+          {% if all_categories %}
+            {% for category in all_categories %}
+            <label class="filter-checkbox">
+              <input type="checkbox" name="category" value="{{ category }}"{{ ' checked' if category in selected_categories }}>
+              <span class="checkbox-box"></span>
+              <span>{{ category }}</span>
+            </label>
+            {% endfor %}
+          {% else %}
+            <p style="font-size:11px; color:var(--color-muted); padding:8px 0;">No categories yet.</p>
+          {% endif %}
+        </div>
+        <div class="filters-actions">
+          <a href="{{ url_for('cache.dashboard') }}" class="btn-clear">Clear</a>
+          <button type="submit" class="btn-apply">Apply</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="total-value-block">
+  <span class="total-value-label">Total cache value</span>
+  <div class="total-value-amount">${{ '{:,.2f}'.format(total_value) }}</div>
+</div>
+
+{% if not has_any_items %}
+<div class="empty-state">
+  <i class="ti ti-box"></i>
+  <p class="empty-state-title">It's lonely in here...</p>
+  <p class="empty-state-body">Add your first item to see what it's worth.</p>
+</div>
+{% elif not items %}
+<div class="empty-state">
+  <p class="empty-state-title">No items match these filters</p>
+  <p class="empty-state-body">Try clearing a filter to see more.</p>
+</div>
+{% else %}
+<div class="item-grid">
+  {% for item in items %}
+  <a href="/item/{{ item.id }}" class="item-card">
+    <div class="item-card-photo" style="background-image:url('{{ item.photo_url }}');"></div>
+    <p class="item-card-name">{{ item.name }}</p>
+    <p class="item-card-meta">${{ '{:,.0f}'.format(item.price_purchased) }} · resale ${{ '{:,.0f}'.format(item.resale_value) }}</p>
+  </a>
+  {% endfor %}
+</div>
+{% endif %}
+
+<a href="/add" class="fab-add">
+  <i class="ti ti-plus"></i>
+</a>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/filters.js') }}" defer></script>
+{% endblock %}
