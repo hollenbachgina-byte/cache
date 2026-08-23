@@ -1034,3 +1034,14 @@ textarea.field-input {
   border-radius: 6px;
   object-fit: cover;
 }
+
+.add-items-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.add-items-controls .field-input {
+  flex: 1;
+}
