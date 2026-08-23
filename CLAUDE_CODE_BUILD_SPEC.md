@@ -156,6 +156,8 @@ Any protected route hit while logged out redirects to `/login`.
 - Body/UI text: **Inter** (all weights as needed)
 - Brand wordmark "cache": **Unbounded, weight 900**, always lowercase — in the header/logo treatment AND any body-text mention of the brand name. Do not vary this by screen.
 
+**Layout & responsiveness:** mobile-first, not split evenly with desktop. Every screen's layout, spacing, and touch-target sizing is designed for a phone-width viewport first — matches the mockups (all phone-frame layouts) and the actual use case (casual, on-the-go capture). Desktop just needs to flex reasonably (content stays centered/capped in a mobile-width column via `.app-shell`, nothing stretches or breaks) — it is not a co-equal design target and doesn't get its own layout pass. Confirmed with Gina during Step 3 review.
+
 ---
 
 ## 8. Supporting UI Behaviors
