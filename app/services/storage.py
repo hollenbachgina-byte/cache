@@ -18,7 +18,7 @@ class PhotoUploadError(Exception):
     pass
 
 
-def upload_item_photo(file_storage, user_id):
+def upload_photo(file_storage, user_id):
     try:
         image = Image.open(file_storage.stream)
         image.verify()

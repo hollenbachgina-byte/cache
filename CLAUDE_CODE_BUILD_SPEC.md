@@ -55,6 +55,7 @@ run.py
 
 **User**
 - `id` (PK)
+- `name` (string, nullable — added during Step 8. The Profile mockup shows a display name, but nothing else in Phase 1 collects one; the fuller profile form (name/DOB/gender/forwarding email) stays deferred per Section 9 below — this is a deliberate narrower carve-out of just the `name` field, editable directly on the Profile screen, not that whole form)
 - `phone_number` (string, unique, indexed — normalized via `phonenumbers` before save/lookup)
 - `password_hash` (string)
 - `created_at` (datetime, default now)

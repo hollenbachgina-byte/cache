@@ -25,10 +25,14 @@ def create_app(config_class=Config):
     from app.routes.auth import auth_bp
     from app.routes.cache import cache_bp
     from app.routes.items import items_bp
+    from app.routes.profile import profile_bp
+    from app.routes.collections import collections_bp
 
     app.register_blueprint(health_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(cache_bp)
     app.register_blueprint(items_bp)
+    app.register_blueprint(profile_bp)
+    app.register_blueprint(collections_bp)
 
     return app

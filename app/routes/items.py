@@ -6,7 +6,7 @@ from flask_login import current_user, login_required
 
 from app import db
 from app.models import Item
-from app.services.storage import PhotoUploadError, delete_item_photo, upload_item_photo
+from app.services.storage import PhotoUploadError, delete_item_photo, upload_photo
 
 items_bp = Blueprint("items", __name__)
 
@@ -94,7 +94,7 @@ def add_item():
         ), 400
 
     try:
-        photo_url = upload_item_photo(photo, current_user.id)
+        photo_url = upload_photo(photo, current_user.id)
     except PhotoUploadError as exc:
         return render_template(
             "items/add.html",

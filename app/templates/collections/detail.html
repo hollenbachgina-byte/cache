@@ -1,0 +1,58 @@
+{% extends "app_base.html" %}
+{% block title %}{{ collection.name }}{% endblock %}
+{% block app_content %}
+<div class="header-bar">
+  <a href="{{ url_for('profile.profile') }}" class="back-link"><i class="ti ti-arrow-left"></i></a>
+  <span style="font-size:13px; font-weight:600;">{{ collection.name }}</span>
+  <button type="button" class="back-link" data-toggle-add-items aria-label="Add items" style="background:none; border:none; cursor:pointer;">
+    <i class="ti ti-plus"></i>
+  </button>
+</div>
+
+{% if items %}
+<div class="item-grid">
+  {% for item in items %}
+  <a href="/item/{{ item.id }}" class="collection-item-card">
+    <div class="item-card-photo" style="background-image:url('{{ item.photo_url }}');"></div>
+    <p class="item-card-name">{{ item.name }}</p>
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+  <p class="empty-state-title">No items in this collection yet</p>
+  <p class="empty-state-body">Tap + to add items from your Cache.</p>
+</div>
+{% endif %}
+
+<div class="add-items-picker" data-add-items-picker style="display:none;">
+  {% if available_items %}
+  <form method="post" action="{{ url_for('collections.add_item_to_collection', collection_id=collection.id) }}">
+    {% for item in available_items %}
+    <label class="add-items-picker-item">
+      <input type="checkbox" name="item_id" value="{{ item.id }}">
+      <img src="{{ item.photo_url }}" alt="">
+      <span>{{ item.name }}</span>
+    </label>
+    {% endfor %}
+    <button type="submit" class="btn-primary" style="margin-top:8px;">Add selected items</button>
+  </form>
+  {% else %}
+  <p class="empty-collections">All your items are already in this collection.</p>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var toggle = document.querySelector("[data-toggle-add-items]");
+    var picker = document.querySelector("[data-add-items-picker]");
+    if (toggle && picker) {
+      toggle.addEventListener("click", function () {
+        picker.style.display = picker.style.display === "none" ? "block" : "none";
+      });
+    }
+  });
+</script>
+{% endblock %}

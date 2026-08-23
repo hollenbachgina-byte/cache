@@ -8,7 +8,7 @@
 </div>
 
 <div class="form-panel-relative">
-  <form method="post" action="{{ url_for('items.add_item') }}" enctype="multipart/form-data" data-add-item-form>
+  <form method="post" action="{{ url_for('items.add_item') }}" enctype="multipart/form-data" data-photo-form>
     <label for="photo-input" class="photo-dropzone{{ ' has-error' if errors and errors.photo }}">
       <img data-photo-preview alt="">
       <i class="ti ti-camera-plus" data-photo-placeholder-icon></i>

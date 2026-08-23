@@ -44,6 +44,16 @@ document.addEventListener("DOMContentLoaded", function () {
             }
             if (placeholderIcon) placeholderIcon.style.display = "none";
             if (placeholderText) placeholderText.style.display = "none";
+
+            // Avatar upload (Profile screen) has no separate fields to fill
+            // in first, so it submits itself the moment compression is done
+            // rather than waiting for an explicit "Save" tap.
+            var ownForm = input.closest("form");
+            if (ownForm && ownForm.hasAttribute("data-photo-auto-submit")) {
+              var autoOverlay = document.querySelector("[data-uploading-overlay]");
+              if (autoOverlay) autoOverlay.style.display = "flex";
+              ownForm.submit();
+            }
           },
           "image/jpeg",
           JPEG_QUALITY
@@ -54,7 +64,7 @@ document.addEventListener("DOMContentLoaded", function () {
     reader.readAsDataURL(file);
   });
 
-  var form = document.querySelector("[data-add-item-form]");
+  var form = document.querySelector("[data-photo-form]");
   var submitBtn = document.querySelector("[data-submit-btn]");
   var overlay = document.querySelector("[data-uploading-overlay]");
 
