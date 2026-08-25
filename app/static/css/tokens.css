@@ -703,7 +703,7 @@ textarea.field-input {
   border-radius: 10px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
   overflow: hidden;
-  width: 140px;
+  width: 170px;
   z-index: 20;
 }
 
@@ -711,12 +711,16 @@ textarea.field-input {
   display: block;
 }
 
-.item-menu-delete {
+.item-menu-panel form {
+  margin: 0;
+}
+
+.item-menu-option {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 12px 14px;
-  color: var(--color-error);
+  color: var(--color-text);
   background: none;
   border: none;
   width: 100%;
@@ -724,7 +728,33 @@ textarea.field-input {
   font-size: 14px;
   font-weight: 500;
   font-family: var(--font-body);
+  text-decoration: none;
   cursor: pointer;
+}
+
+.item-menu-archive {
+  color: var(--color-secondary);
+}
+
+.item-menu-divider {
+  height: 1px;
+  background: rgba(38, 5, 3, 0.08);
+  margin: 0;
+}
+
+.item-menu-delete {
+  color: var(--color-error);
+}
+
+.archived-badge {
+  display: inline-block;
+  margin-bottom: 8px;
+  padding: 3px 9px;
+  background: #e3d9c9;
+  color: #8a8171;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 600;
 }
 
 .item-photo-full {

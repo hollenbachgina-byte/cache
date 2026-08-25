@@ -154,3 +154,12 @@ def delete_item(item_id):
     db.session.commit()
 
     return redirect(url_for("cache.dashboard"))
+
+
+@items_bp.route("/item/<int:item_id>/archive", methods=["POST"])
+@login_required
+def toggle_archived(item_id):
+    item = _get_owned_item_or_404(item_id)
+    item.is_archived = not item.is_archived
+    db.session.commit()
+    return redirect(url_for("items.item_detail", item_id=item.id))

@@ -9,7 +9,18 @@
       <i class="ti ti-dots-vertical"></i>
     </button>
     <div class="item-menu-panel" data-item-menu-panel>
-      <button type="button" class="item-menu-delete" data-open-delete-modal>
+      <a href="/item/{{ item.id }}/edit" class="item-menu-option">
+        <i class="ti ti-pencil"></i>
+        <span>Edit item</span>
+      </a>
+      <form method="post" action="{{ url_for('items.toggle_archived', item_id=item.id) }}">
+        <button type="submit" class="item-menu-option item-menu-archive">
+          <i class="ti ti-archive"></i>
+          <span>{{ 'Unarchive item' if item.is_archived else 'Archive item' }}</span>
+        </button>
+      </form>
+      <div class="item-menu-divider"></div>
+      <button type="button" class="item-menu-option item-menu-delete" data-open-delete-modal>
         <i class="ti ti-trash"></i>
         <span>Delete item</span>
       </button>
@@ -20,6 +31,9 @@
 <div class="item-photo-full" style="background-image:url('{{ item.photo_url }}');"></div>
 
 <div class="item-detail-body">
+  {% if item.is_archived %}
+  <span class="archived-badge">Archived</span>
+  {% endif %}
   <p class="item-detail-name">{{ item.name }}</p>
   <p class="item-detail-meta">
     {%- if item.brand %}{{ item.brand }} · {% endif -%}
@@ -33,7 +47,7 @@
     </div>
     <div>
       <p class="item-stat-label">RESALE EST.</p>
-      <p class="item-stat-value resale">${{ '{:,.0f}'.format(item.resale_value) }}</p>
+      <span class="price-pill">${{ '{:,.0f}'.format(item.resale_value) }}</span>
     </div>
   </div>
 
