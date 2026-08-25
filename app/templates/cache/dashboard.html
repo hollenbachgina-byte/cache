@@ -2,14 +2,31 @@
 {% block title %}My Cache{% endblock %}
 {% block app_content %}
 <div class="dashboard-header">
-  <span class="dashboard-title">My Cache</span>
+  <span class="dashboard-title page-title">My Cache</span>
+</div>
+
+<div class="dashboard-cache-value-wrap">
+  <div class="cache-value-card">
+    <div class="cache-value-amount">${{ '{:,.2f}'.format(total_value) }}</div>
+    <span>TOTAL CACHE VALUE</span>
+  </div>
+</div>
+
+<div class="filters-row">
   <div class="filters-wrap">
-    <button type="button" class="filters-btn{{ ' active' if selected_categories }}" data-filters-toggle>
+    <button type="button" class="filters-btn{{ ' active' if selected_categories or show_archived }}" data-filters-toggle>
       Filters{{ ' (' ~ selected_categories|length ~ ')' if selected_categories }} ▾
     </button>
     <div class="filters-panel" data-filters-panel>
       <form method="get" action="{{ url_for('cache.dashboard') }}">
         <div class="filters-panel-body">
+          <label class="toggle-switch-row">
+            <span>Show archived items</span>
+            <span class="toggle-switch">
+              <input type="checkbox" name="show_archived" value="1"{{ ' checked' if show_archived }}>
+              <span class="toggle-switch-track"></span>
+            </span>
+          </label>
           {% if all_categories %}
             {% for category in all_categories %}
             <label class="filter-checkbox">
@@ -19,7 +36,7 @@
             </label>
             {% endfor %}
           {% else %}
-            <p style="font-size:11px; color:var(--color-muted); padding:8px 0;">No categories yet.</p>
+            <p style="font-size:13px; color:var(--color-muted); padding:8px 0;">No categories yet.</p>
           {% endif %}
         </div>
         <div class="filters-actions">
@@ -29,11 +46,6 @@
       </form>
     </div>
   </div>
-</div>
-
-<div class="total-value-block">
-  <span class="total-value-label">Total cache value</span>
-  <div class="total-value-amount">${{ '{:,.2f}'.format(total_value) }}</div>
 </div>
 
 {% if not has_any_items %}
@@ -53,7 +65,11 @@
   <a href="/item/{{ item.id }}" class="item-card">
     <div class="item-card-photo" style="background-image:url('{{ item.photo_url }}');"></div>
     <p class="item-card-name">{{ item.name }}</p>
-    <p class="item-card-meta">${{ '{:,.0f}'.format(item.price_purchased) }} · resale ${{ '{:,.0f}'.format(item.resale_value) }}</p>
+    <div class="item-card-prices">
+      <span class="price-pill">${{ '{:,.0f}'.format(item.resale_value) }}</span>
+      <span class="price-struck">${{ '{:,.0f}'.format(item.price_purchased) }}</span>
+    </div>
+    <span class="category-tag category-tag-small">{{ item.category }}</span>
   </a>
   {% endfor %}
 </div>

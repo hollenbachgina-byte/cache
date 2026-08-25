@@ -3,12 +3,12 @@
 {% block content %}
 <div class="header-bar">
   <a href="{{ url_for('auth.register') }}" class="back-link"><i class="ti ti-arrow-left"></i></a>
-  <span class="wordmark" style="font-size:14px;">cache</span>
+  <span class="wordmark" style="font-size:16px;">cache</span>
   <span style="width:16px;"></span>
 </div>
 <form method="post" action="{{ url_for('auth.login') }}" class="form-panel">
-  <p style="font-size:16px; font-weight:600; margin:0 0 4px;">Welcome back</p>
-  <p style="font-size:11px; color:var(--color-muted); margin:0 0 18px;">Sign in to see what your stuff is worth.</p>
+  <p style="font-size:18px; font-weight:600; margin:0 0 4px;">Welcome back</p>
+  <p style="font-size:13px; color:var(--color-muted); margin:0 0 18px;">Sign in to see what your stuff is worth.</p>
 
   <div class="field-group">
     <label class="field-label" for="phone_number">Phone number</label>
@@ -39,6 +39,6 @@
   </div>
 
   <button type="submit" class="btn-primary">Sign in</button>
-  <p style="text-align:center; font-size:11px; color:var(--color-muted); margin:12px 0 0;">No account? <a href="{{ url_for('auth.register') }}" class="link-secondary">create one</a></p>
+  <p style="text-align:center; font-size:13px; color:var(--color-muted); margin:12px 0 0;">No account? <a href="{{ url_for('auth.register') }}" class="link-secondary">create one</a></p>
 </form>
 {% endblock %}

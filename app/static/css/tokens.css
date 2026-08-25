@@ -52,7 +52,7 @@ body {
 .back-link {
   color: var(--color-text);
   text-decoration: none;
-  font-size: 16px;
+  font-size: 18px;
   line-height: 1;
 }
 
@@ -63,7 +63,7 @@ body {
   color: #fff;
   border: none;
   border-radius: 8px;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
   font-family: var(--font-body);
   cursor: pointer;
@@ -84,7 +84,7 @@ body {
 
 .field-label {
   display: block;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 500;
   color: var(--color-muted);
   margin-bottom: 4px;
@@ -97,7 +97,7 @@ body {
   border: 1px solid rgba(38, 5, 3, 0.2);
   border-radius: 8px;
   padding: 0 12px;
-  font-size: 12px;
+  font-size: 14px;
   font-family: var(--font-body);
   color: var(--color-text);
 }
@@ -108,7 +108,7 @@ body {
 }
 
 .error-message {
-  font-size: 10px;
+  font-size: 12px;
   color: var(--color-text);
   margin: 5px 0 0;
   display: flex;
@@ -118,7 +118,7 @@ body {
 
 .error-message .ti {
   color: var(--color-error);
-  font-size: 13px;
+  font-size: 15px;
 }
 
 .link-secondary {
@@ -145,7 +145,7 @@ body {
 }
 
 .splash-tagline {
-  font-size: 13px;
+  font-size: 15px;
   color: var(--color-muted);
   margin: 8px 0 32px;
 }
@@ -155,7 +155,7 @@ body {
 }
 
 .form-heading {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
   margin: 0 0 18px;
 }
@@ -181,7 +181,7 @@ body {
 }
 
 .success-icon .ti {
-  font-size: 28px;
+  font-size: 32px;
   color: #fff;
 }
 
@@ -223,11 +223,11 @@ body {
 }
 
 .bottom-nav-item .ti {
-  font-size: 16px;
+  font-size: 18px;
 }
 
 .bottom-nav-item span {
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .bottom-nav-item.active {
@@ -246,9 +246,17 @@ body {
   padding: 16px 18px 0;
 }
 
+.page-title {
+  font-family: var(--font-wordmark);
+  font-weight: 900;
+  text-transform: lowercase;
+  font-size: 20px;
+  margin-bottom: 20px;
+  display: block;
+}
+
 .dashboard-title {
-  font-size: 15px;
-  font-weight: 600;
+  /* font-size/weight now come from .page-title (Section 2, Feedback Round 2) */
 }
 
 .filters-wrap {
@@ -261,7 +269,7 @@ body {
   border: 1px solid var(--color-secondary);
   color: var(--color-secondary);
   border-radius: 999px;
-  font-size: 10px;
+  font-size: 12px;
   font-family: var(--font-body);
   cursor: pointer;
 }
@@ -298,7 +306,7 @@ body {
   gap: 8px;
   padding: 8px 0;
   border-bottom: 1px solid rgba(38, 5, 3, 0.06);
-  font-size: 11px;
+  font-size: 13px;
   cursor: pointer;
   position: relative;
 }
@@ -342,7 +350,7 @@ body {
   background: #fff;
   border: 1px solid rgba(38, 5, 3, 0.15);
   border-radius: 6px;
-  font-size: 10px;
+  font-size: 12px;
   font-family: var(--font-body);
   color: var(--color-text);
   text-decoration: none;
@@ -358,28 +366,103 @@ body {
   color: #fff;
   border: none;
   border-radius: 6px;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
   font-family: var(--font-body);
   cursor: pointer;
 }
 
-.total-value-block {
+.dashboard-cache-value-wrap {
   padding: 12px 18px 0;
 }
 
-.total-value-label {
-  font-size: 9px;
-  color: var(--color-muted);
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
+.filters-row {
+  padding: 12px 18px 0;
+  display: flex;
+  justify-content: flex-end;
 }
 
-.total-value-amount {
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--color-primary);
+.toggle-switch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(38, 5, 3, 0.06);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 32px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.toggle-switch input {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  cursor: pointer;
+}
+
+.toggle-switch-track {
+  position: absolute;
+  inset: 0;
+  background: #d8d0c2;
+  border-radius: 999px;
+  transition: background 0.15s ease;
+}
+
+.toggle-switch-track::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.15s ease;
+}
+
+.toggle-switch input:checked + .toggle-switch-track {
+  background: var(--color-secondary);
+}
+
+.toggle-switch input:checked + .toggle-switch-track::before {
+  transform: translateX(14px);
+}
+
+.item-card-prices {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   margin-top: 2px;
+}
+
+.price-pill {
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 9px;
+  border-radius: 999px;
+}
+
+.price-struck {
+  font-size: 10px;
+  color: var(--color-muted);
+  text-decoration: line-through;
+}
+
+.category-tag-small {
+  padding: 2px 8px;
+  font-size: 9px;
+  margin-top: 6px;
 }
 
 .item-grid {
@@ -409,13 +492,7 @@ body {
 }
 
 .item-card-name {
-  font-size: 11px;
-  margin: 0;
-}
-
-.item-card-meta {
-  font-size: 10px;
-  color: var(--color-muted);
+  font-size: 13px;
   margin: 0;
 }
 
@@ -440,7 +517,7 @@ body {
 }
 
 .fab-add .ti {
-  font-size: 18px;
+  font-size: 21px;
 }
 
 .empty-state {
@@ -454,18 +531,18 @@ body {
 }
 
 .empty-state .ti {
-  font-size: 28px;
+  font-size: 32px;
   color: #c7b585;
 }
 
 .empty-state-title {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   margin: 12px 0 4px;
 }
 
 .empty-state-body {
-  font-size: 11px;
+  font-size: 13px;
   color: var(--color-muted);
   margin: 0;
 }
@@ -497,12 +574,12 @@ body {
 }
 
 .photo-dropzone .ti {
-  font-size: 22px;
+  font-size: 25px;
   color: var(--color-muted);
 }
 
 .photo-dropzone span {
-  font-size: 10px;
+  font-size: 12px;
   color: var(--color-muted);
 }
 
@@ -565,20 +642,20 @@ textarea.field-input {
 }
 
 .uploading-text {
-  font-size: 12px;
+  font-size: 14px;
   color: var(--color-muted);
 }
 
 /* Add-item success */
 .success-total {
-  font-size: 26px;
+  font-size: 30px;
   font-weight: 700;
   color: var(--color-primary);
   margin-bottom: 2px;
 }
 
 .success-delta {
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--color-accent);
   margin-bottom: 22px;
@@ -592,7 +669,7 @@ textarea.field-input {
   color: #fff;
   border: none;
   border-radius: 8px;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   font-family: var(--font-body);
   text-decoration: none;
@@ -611,7 +688,7 @@ textarea.field-input {
   background: none;
   border: none;
   color: var(--color-text);
-  font-size: 16px;
+  font-size: 18px;
   cursor: pointer;
   padding: 0;
   line-height: 1;
@@ -644,7 +721,7 @@ textarea.field-input {
   border: none;
   width: 100%;
   text-align: left;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 500;
   font-family: var(--font-body);
   cursor: pointer;
@@ -663,13 +740,13 @@ textarea.field-input {
 }
 
 .item-detail-name {
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 600;
   margin: 0;
 }
 
 .item-detail-meta {
-  font-size: 11px;
+  font-size: 13px;
   color: var(--color-muted);
   margin: 4px 0 12px;
 }
@@ -682,13 +759,13 @@ textarea.field-input {
 }
 
 .item-stat-label {
-  font-size: 9px;
+  font-size: 10px;
   color: var(--color-muted);
   margin: 0;
 }
 
 .item-stat-value {
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
   margin: 2px 0 0;
 }
@@ -698,7 +775,7 @@ textarea.field-input {
 }
 
 .item-detail-description {
-  font-size: 12px;
+  font-size: 14px;
   color: var(--color-text);
   margin: 12px 0;
 }
@@ -710,7 +787,7 @@ textarea.field-input {
   background: var(--color-accent);
   color: #fff;
   border-radius: 999px;
-  font-size: 9px;
+  font-size: 10px;
 }
 
 /* Delete confirmation modal */
@@ -750,18 +827,18 @@ textarea.field-input {
 }
 
 .modal-icon-circle .ti {
-  font-size: 18px;
+  font-size: 21px;
   color: var(--color-error);
 }
 
 .modal-title {
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
   margin: 0 0 6px;
 }
 
 .modal-body {
-  font-size: 10px;
+  font-size: 12px;
   color: var(--color-muted);
   margin: 0 0 16px;
 }
@@ -773,7 +850,7 @@ textarea.field-input {
   color: #fff;
   border: none;
   border-radius: 8px;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 600;
   font-family: var(--font-body);
   margin-bottom: 8px;
@@ -787,7 +864,7 @@ textarea.field-input {
   color: var(--color-text);
   border: 1px solid rgba(38, 5, 3, 0.2);
   border-radius: 8px;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 600;
   font-family: var(--font-body);
   cursor: pointer;
@@ -803,8 +880,7 @@ textarea.field-input {
 }
 
 .profile-header span {
-  font-size: 13px;
-  font-weight: 600;
+  /* font-size/weight now come from .page-title (Section 2, Feedback Round 2) */
 }
 
 .profile-body {
@@ -838,7 +914,7 @@ textarea.field-input {
 }
 
 .avatar-circle .ti {
-  font-size: 26px;
+  font-size: 30px;
   color: #8a8171;
 }
 
@@ -858,7 +934,7 @@ textarea.field-input {
 }
 
 .avatar-camera-badge .ti {
-  font-size: 12px;
+  font-size: 14px;
   color: #fff;
 }
 
@@ -871,7 +947,7 @@ textarea.field-input {
 }
 
 .profile-name-text {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
 }
 
@@ -879,7 +955,7 @@ textarea.field-input {
   background: none;
   border: none;
   color: var(--color-muted);
-  font-size: 11px;
+  font-size: 13px;
   cursor: pointer;
   padding: 0;
   line-height: 1;
@@ -897,7 +973,7 @@ textarea.field-input {
   border: none;
   border-bottom: 1px solid var(--color-secondary);
   background: none;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   font-family: var(--font-body);
   color: var(--color-text);
@@ -914,7 +990,7 @@ textarea.field-input {
   background: none;
   border: none;
   color: var(--color-secondary);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   font-family: var(--font-body);
@@ -926,7 +1002,7 @@ textarea.field-input {
 }
 
 .profile-caching-since {
-  font-size: 10px;
+  font-size: 12px;
   color: var(--color-muted);
   margin: 3px 0 0;
 }
@@ -942,14 +1018,14 @@ textarea.field-input {
 
 .cache-value-card span {
   display: block;
-  font-size: 9px;
+  font-size: 10px;
   color: var(--color-muted);
   letter-spacing: 0.05em;
   margin-top: 4px;
 }
 
 .cache-value-amount {
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 700;
   color: var(--color-primary);
 }
@@ -967,7 +1043,7 @@ textarea.field-input {
 }
 
 .collections-section-header span {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
 }
 
@@ -975,7 +1051,7 @@ textarea.field-input {
   background: none;
   border: none;
   color: var(--color-text);
-  font-size: 14px;
+  font-size: 16px;
   cursor: pointer;
   padding: 0;
 }
@@ -993,12 +1069,12 @@ textarea.field-input {
 }
 
 .collection-row .ti {
-  font-size: 14px;
+  font-size: 16px;
   color: var(--color-muted);
 }
 
 .collection-row span {
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .create-collection-panel {
@@ -1024,7 +1100,7 @@ textarea.field-input {
   border: 1px solid rgba(38, 5, 3, 0.2);
   border-radius: 6px;
   padding: 6px 10px;
-  font-size: 11px;
+  font-size: 13px;
   font-family: var(--font-body);
 }
 
@@ -1044,21 +1120,21 @@ textarea.field-input {
   color: #fff;
   border: none;
   border-radius: 6px;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
   font-family: var(--font-body);
   cursor: pointer;
 }
 
 .empty-collections {
-  font-size: 11px;
+  font-size: 13px;
   color: var(--color-muted);
   padding: 8px 0;
 }
 
 /* Collection detail */
 .collection-description {
-  font-size: 11px;
+  font-size: 13px;
   color: var(--color-muted);
   padding: 8px 18px 0;
   margin: 0;
@@ -1089,7 +1165,7 @@ a.collection-item-card {
 }
 
 .asking-price-display span {
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--color-primary);
 }
@@ -1098,7 +1174,7 @@ a.collection-item-card {
   background: none;
   border: none;
   color: var(--color-muted);
-  font-size: 10px;
+  font-size: 12px;
   cursor: pointer;
   padding: 0;
 }
@@ -1116,7 +1192,7 @@ a.collection-item-card {
   border: 1px solid rgba(38, 5, 3, 0.2);
   border-radius: 6px;
   padding: 0 6px;
-  font-size: 10px;
+  font-size: 12px;
   font-family: var(--font-body);
 }
 
@@ -1127,7 +1203,7 @@ a.collection-item-card {
   color: #fff;
   border: none;
   border-radius: 6px;
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 600;
   font-family: var(--font-body);
   cursor: pointer;
@@ -1146,7 +1222,7 @@ a.collection-item-card {
   border: 1px solid rgba(38, 5, 3, 0.2);
   border-radius: 6px;
   padding: 0 8px;
-  font-size: 10px;
+  font-size: 12px;
   font-family: var(--font-body);
   color: var(--color-text);
   background: #fff;
@@ -1166,7 +1242,7 @@ a.collection-item-card {
 }
 
 .share-copied-note {
-  font-size: 10px;
+  font-size: 12px;
   color: var(--color-secondary);
   font-weight: 600;
   margin: 0;
@@ -1184,7 +1260,7 @@ a.collection-item-card {
   background: #fff;
   border-radius: 10px;
   margin-bottom: 6px;
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .add-items-picker-item img {
@@ -1224,8 +1300,7 @@ a.collection-item-card {
 }
 
 .sell-stub-header span {
-  font-size: 13px;
-  font-weight: 600;
+  /* font-size/weight now come from .page-title (Section 2, Feedback Round 2) */
   color: var(--color-text);
 }
 
@@ -1240,7 +1315,7 @@ a.collection-item-card {
 }
 
 .sell-stub-body .ti {
-  font-size: 26px;
+  font-size: 30px;
   color: #c7bfae;
 }
 
@@ -1250,7 +1325,7 @@ a.collection-item-card {
   background: #e3d9c9;
   color: #8a8171;
   border-radius: 999px;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
 }
 
@@ -1274,20 +1349,20 @@ a.collection-item-card {
 }
 
 .public-owner-name {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   margin: 0;
 }
 
 .public-collection-name {
-  font-size: 20px;
+  font-size: 23px;
   font-weight: 700;
   text-align: center;
   margin: 0 0 6px;
 }
 
 .public-collection-description {
-  font-size: 12px;
+  font-size: 14px;
   color: var(--color-muted);
   text-align: center;
   margin: 0 0 20px;
@@ -1306,26 +1381,26 @@ a.collection-item-card {
 }
 
 .public-item-paid {
-  font-size: 10px;
+  font-size: 12px;
   color: var(--color-text);
 }
 
 .public-item-asking {
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
   color: var(--color-primary);
 }
 
 .public-empty {
   text-align: center;
-  font-size: 12px;
+  font-size: 14px;
   color: var(--color-muted);
   margin-top: 40px;
 }
 
 .public-footer {
   text-align: center;
-  font-size: 10px;
+  font-size: 12px;
   color: var(--color-muted);
   margin-top: 40px;
 }

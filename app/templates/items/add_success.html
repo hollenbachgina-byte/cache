@@ -3,8 +3,8 @@
 {% block app_content %}
 <div class="success-screen" data-previous-total="{{ previous_total }}" data-new-total="{{ new_total }}">
   <div class="success-icon"><i class="ti ti-check"></i></div>
-  <p style="font-size:17px; font-weight:600; margin:0 0 4px;">Success!</p>
-  <p style="font-size:11px; color:var(--color-muted); margin:0 0 16px;">Your Cache is now worth</p>
+  <p style="font-size:20px; font-weight:600; margin:0 0 4px;">Success!</p>
+  <p style="font-size:13px; color:var(--color-muted); margin:0 0 16px;">Your Cache is now worth</p>
   <div class="success-total" data-count-up>${{ '{:,.0f}'.format(previous_total) }}</div>
   <div class="success-delta" data-success-delta>+${{ '{:,.0f}'.format(delta) }} this item</div>
   <a href="{{ url_for('cache.dashboard') }}" class="btn-secondary">Back to my Cache</a>
