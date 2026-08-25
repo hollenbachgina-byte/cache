@@ -125,6 +125,8 @@ run.py
 | GET | `/` | Yes | See Cache dashboard. Accepts `?category=` query param(s) for filtering (multi-select) |
 | GET/POST | `/add` | Yes | Add-item form. On submit: compress+upload photo to Supabase Storage, create Item (`status=Captured`, `source=manual`), show success screen with count-up animation, redirect to `/` |
 | GET | `/item/<id>` | Yes, owner only | Item detail — both purchase price and computed resale value shown |
+| GET/POST | `/item/<id>/edit` | Yes, owner only | Edit form, reuses the Add Item field set (Section 8, Feedback Round 2), pre-filled. Photo optional — only replaced if a new one is chosen |
+| POST | `/item/<id>/archive` | Yes, owner only | Toggles `is_archived` (reversible), redirects back to the item |
 | POST | `/item/<id>/delete` | Yes, owner only | Delete after confirmation modal, redirect to `/` |
 | GET | `/profile` | Yes | Profile picture (placeholder icon), name, "Caching since [date]", cache value, My Collections list |
 | POST | `/collections` | Yes | Create a named collection with an optional description; redirects to its detail page with `?created=1` to trigger the share-link success modal |
