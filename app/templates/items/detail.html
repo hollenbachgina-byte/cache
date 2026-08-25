@@ -9,7 +9,7 @@
       <i class="ti ti-dots-vertical"></i>
     </button>
     <div class="item-menu-panel" data-item-menu-panel>
-      <a href="/item/{{ item.id }}/edit" class="item-menu-option">
+      <a href="{{ url_for('items.edit_item', item_id=item.id) }}" class="item-menu-option">
         <i class="ti ti-pencil"></i>
         <span>Edit item</span>
       </a>

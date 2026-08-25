@@ -1499,3 +1499,102 @@ a.collection-item-card {
   padding: 0 18px;
   margin-bottom: 12px;
 }
+
+/* Add/Edit Item form — pill-chip labels, sectioned layout
+   (Feedback Round 2, Section 9). Deliberately separate from .field-*
+   (shared with auth forms) so this doesn't restyle login/register. */
+.form-section-header {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 24px 0 14px;
+}
+
+.form-section-header:first-of-type {
+  margin-top: 18px;
+}
+
+.pill-field {
+  position: relative;
+  margin-top: 12px;
+  margin-bottom: 6px;
+}
+
+.pill-field-label {
+  position: absolute;
+  top: -8px;
+  left: 10px;
+  background: #f2ede4;
+  color: var(--color-muted);
+  font-size: 9px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 999px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.pill-field-input {
+  width: 100%;
+  height: 44px;
+  border: 1.5px solid rgba(38, 5, 3, 0.15);
+  border-radius: 8px;
+  padding: 0 12px;
+  font-size: 13px;
+  font-family: var(--font-body);
+  color: var(--color-text);
+  background: #fff;
+}
+
+.pill-field-input:focus {
+  outline: none;
+  border-color: rgba(38, 5, 3, 0.3);
+}
+
+.pill-field-input.has-error {
+  background: var(--color-error-bg);
+  border-color: var(--color-error);
+}
+
+textarea.pill-field-input {
+  min-height: 70px;
+  padding: 10px 12px;
+  resize: vertical;
+}
+
+.pill-field-row {
+  display: flex;
+  gap: 8px;
+}
+
+.pill-field-row .pill-field {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Category field: pine border + chevron signal it's a dropdown, not
+   label color — the label chip stays neutral like every other field. */
+.pill-field.category-field .pill-field-input {
+  border-color: var(--color-secondary);
+  padding-right: 34px;
+}
+
+.pill-field-chevron {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-secondary);
+  pointer-events: none;
+  font-size: 14px;
+}
+
+.dynamic-fields-section {
+  display: none;
+}
+
+.dynamic-fields-section.visible {
+  display: block;
+}

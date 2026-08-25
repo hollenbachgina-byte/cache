@@ -5,7 +5,7 @@ from flask import Blueprint, abort, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
 from app import db
-from app.models import Item
+from app.models import Item, ItemCondition
 from app.services.storage import PhotoUploadError, delete_item_photo, upload_photo
 
 items_bp = Blueprint("items", __name__)
@@ -22,6 +22,8 @@ PRESET_CATEGORIES = [
     "Other",
 ]
 
+OPTIONAL_TEXT_FIELDS = ["brand", "retailer", "size", "material", "color", "dimensions", "storage_capacity"]
+
 
 def get_suggested_categories(user_id):
     """Preset categories plus anything this user has already used, merged
@@ -36,23 +38,26 @@ def get_suggested_categories(user_id):
     return sorted(set(PRESET_CATEGORIES) | user_categories)
 
 
-@items_bp.route("/add", methods=["GET", "POST"])
-@login_required
-def add_item():
-    if request.method == "GET":
-        return render_template(
-            "items/add.html",
-            suggested_categories=get_suggested_categories(current_user.id),
-        )
+def _parse_condition(raw):
+    raw = (raw or "").strip()
+    if not raw:
+        return None
+    try:
+        return ItemCondition[raw]
+    except KeyError:
+        return None
 
-    form = request.form
+
+def _validate_item_form(form, files, require_photo):
+    """Shared between add and edit — returns (parsed_values, errors).
+    parsed_values has real Python types (Decimal, date, enum); errors is
+    keyed by field name for inline display."""
     name = form.get("name", "").strip()
-    brand = form.get("brand", "").strip()
     category = form.get("category", "").strip()
     date_str = form.get("date_purchased", "").strip()
     price_str = form.get("price_purchased", "").strip()
     description = form.get("description", "").strip()
-    photo = request.files.get("photo")
+    photo = files.get("photo")
 
     errors = {}
 
@@ -82,36 +87,64 @@ def add_item():
         except InvalidOperation:
             errors["price_purchased"] = "Enter a valid price."
 
-    if not photo or photo.filename == "":
+    if require_photo and (not photo or photo.filename == ""):
         errors["photo"] = "Add a photo."
+
+    parsed = {
+        "name": name,
+        "category": category,
+        "date_purchased": date_purchased,
+        "price_purchased": price_purchased,
+        "description": description or None,
+        "condition": _parse_condition(form.get("condition")),
+        "photo": photo,
+    }
+    for field in OPTIONAL_TEXT_FIELDS:
+        parsed[field] = form.get(field, "").strip() or None
+
+    return parsed, errors
+
+
+@items_bp.route("/add", methods=["GET", "POST"])
+@login_required
+def add_item():
+    if request.method == "GET":
+        return render_template(
+            "items/add.html",
+            values={},
+            suggested_categories=get_suggested_categories(current_user.id),
+        )
+
+    parsed, errors = _validate_item_form(request.form, request.files, require_photo=True)
 
     if errors:
         return render_template(
             "items/add.html",
             errors=errors,
-            form=form,
+            values=request.form,
             suggested_categories=get_suggested_categories(current_user.id),
         ), 400
 
     try:
-        photo_url = upload_photo(photo, current_user.id)
+        photo_url = upload_photo(parsed["photo"], current_user.id)
     except PhotoUploadError as exc:
         return render_template(
             "items/add.html",
             errors={"photo": str(exc)},
-            form=form,
+            values=request.form,
             suggested_categories=get_suggested_categories(current_user.id),
         ), 400
 
     item = Item(
         user_id=current_user.id,
-        name=name,
-        brand=brand or None,
-        date_purchased=date_purchased,
-        price_purchased=price_purchased,
+        name=parsed["name"],
+        date_purchased=parsed["date_purchased"],
+        price_purchased=parsed["price_purchased"],
         photo_url=photo_url,
-        description=description or None,
-        category=category,
+        description=parsed["description"],
+        category=parsed["category"],
+        condition=parsed["condition"],
+        **{field: parsed[field] for field in OPTIONAL_TEXT_FIELDS},
     )
     db.session.add(item)
     db.session.commit()
@@ -142,6 +175,74 @@ def _get_owned_item_or_404(item_id):
 def item_detail(item_id):
     item = _get_owned_item_or_404(item_id)
     return render_template("items/detail.html", item=item)
+
+
+def _item_to_values(item):
+    values = {
+        "name": item.name,
+        "category": item.category,
+        "date_purchased": item.date_purchased.isoformat() if item.date_purchased else "",
+        "price_purchased": item.price_purchased,
+        "description": item.description or "",
+        "condition": item.condition.name if item.condition else "",
+    }
+    for field in OPTIONAL_TEXT_FIELDS:
+        values[field] = getattr(item, field) or ""
+    return values
+
+
+@items_bp.route("/item/<int:item_id>/edit", methods=["GET", "POST"])
+@login_required
+def edit_item(item_id):
+    item = _get_owned_item_or_404(item_id)
+
+    if request.method == "GET":
+        return render_template(
+            "items/edit.html",
+            item=item,
+            values=_item_to_values(item),
+            suggested_categories=get_suggested_categories(current_user.id),
+        )
+
+    # Photo is optional on edit — only replace it if a new one was chosen.
+    parsed, errors = _validate_item_form(request.form, request.files, require_photo=False)
+
+    if errors:
+        return render_template(
+            "items/edit.html",
+            item=item,
+            errors=errors,
+            values=request.form,
+            suggested_categories=get_suggested_categories(current_user.id),
+        ), 400
+
+    new_photo = parsed["photo"]
+    if new_photo and new_photo.filename != "":
+        try:
+            new_photo_url = upload_photo(new_photo, current_user.id)
+        except PhotoUploadError as exc:
+            return render_template(
+                "items/edit.html",
+                item=item,
+                errors={"photo": str(exc)},
+                values=request.form,
+                suggested_categories=get_suggested_categories(current_user.id),
+            ), 400
+        old_photo_url = item.photo_url
+        item.photo_url = new_photo_url
+        delete_item_photo(old_photo_url)
+
+    item.name = parsed["name"]
+    item.category = parsed["category"]
+    item.date_purchased = parsed["date_purchased"]
+    item.price_purchased = parsed["price_purchased"]
+    item.description = parsed["description"]
+    item.condition = parsed["condition"]
+    for field in OPTIONAL_TEXT_FIELDS:
+        setattr(item, field, parsed[field])
+
+    db.session.commit()
+    return redirect(url_for("items.item_detail", item_id=item.id))
 
 
 @items_bp.route("/item/<int:item_id>/delete", methods=["POST"])

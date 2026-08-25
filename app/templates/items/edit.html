@@ -1,18 +1,18 @@
 {% extends "app_base.html" %}
-{% block title %}Add item{% endblock %}
+{% block title %}Edit item{% endblock %}
 {% block app_content %}
 <div class="header-bar">
-  <a href="{{ url_for('cache.dashboard') }}" class="back-link"><i class="ti ti-arrow-left"></i></a>
-  <span style="font-size:15px; font-weight:600;">Add item</span>
+  <a href="{{ url_for('items.item_detail', item_id=item.id) }}" class="back-link"><i class="ti ti-arrow-left"></i></a>
+  <span style="font-size:15px; font-weight:600;">Edit item</span>
   <span style="width:16px;"></span>
 </div>
 
 <div class="form-panel-relative">
-  <form method="post" action="{{ url_for('items.add_item') }}" enctype="multipart/form-data" data-photo-form>
+  <form method="post" action="{{ url_for('items.edit_item', item_id=item.id) }}" enctype="multipart/form-data" data-photo-form>
     <label for="photo-input" class="photo-dropzone{{ ' has-error' if errors and errors.photo }}">
-      <img data-photo-preview alt="">
-      <i class="ti ti-camera-plus" data-photo-placeholder-icon></i>
-      <span data-photo-placeholder-text>Add a photo</span>
+      <img data-photo-preview src="{{ item.photo_url }}" alt="" style="display:block;">
+      <i class="ti ti-camera-plus" data-photo-placeholder-icon style="display:none;"></i>
+      <span data-photo-placeholder-text style="display:none;">Add a photo</span>
     </label>
     <input
       type="file"
@@ -21,7 +21,6 @@
       accept="image/*"
       class="photo-input"
       data-photo-input
-      required
     >
     {% if errors and errors.photo %}
     <p class="error-message" style="margin:-10px 0 12px;"><i class="ti ti-alert-circle"></i>{{ errors.photo }}</p>
@@ -29,7 +28,7 @@
 
     {% include "items/_form_fields.html" %}
 
-    <button type="submit" class="btn-primary" style="margin-top:6px;" data-submit-btn>Add to Cache</button>
+    <button type="submit" class="btn-primary" style="margin-top:6px;" data-submit-btn>Save changes</button>
   </form>
 
   <div class="uploading-overlay" data-uploading-overlay>

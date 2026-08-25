@@ -1,0 +1,154 @@
+{# Shared by items/add.html and items/edit.html. Expects: values (dict-like,
+   .get() works — either request.form on a validation error, or a plain
+   dict built from an existing Item for edit), errors (dict), suggested_categories. #}
+
+<p class="form-section-header">Item basics</p>
+
+<div class="pill-field">
+  <span class="pill-field-label">Name</span>
+  <input
+    type="text"
+    id="name"
+    name="name"
+    class="pill-field-input{{ ' has-error' if errors and errors.name }}"
+    placeholder="Vintage Chronograph"
+    value="{{ values.get('name', '') }}"
+    required
+  >
+  {% if errors and errors.name %}
+  <p class="error-message"><i class="ti ti-alert-circle"></i>{{ errors.name }}</p>
+  {% endif %}
+</div>
+
+<div class="pill-field-row">
+  <div class="pill-field">
+    <span class="pill-field-label">Brand</span>
+    <input
+      type="text"
+      id="brand"
+      name="brand"
+      class="pill-field-input"
+      placeholder="Junghans"
+      value="{{ values.get('brand', '') }}"
+    >
+  </div>
+  <div class="pill-field category-field">
+    <span class="pill-field-label">Category</span>
+    <input
+      type="text"
+      id="category"
+      name="category"
+      list="category-suggestions"
+      class="pill-field-input{{ ' has-error' if errors and errors.category }}"
+      placeholder="Watches"
+      value="{{ values.get('category', '') }}"
+      autocomplete="off"
+      data-category-input
+      required
+    >
+    <i class="ti ti-chevron-down pill-field-chevron"></i>
+    <datalist id="category-suggestions">
+      {% for c in suggested_categories %}
+      <option value="{{ c }}">
+      {% endfor %}
+    </datalist>
+    {% if errors and errors.category %}
+    <p class="error-message"><i class="ti ti-alert-circle"></i>{{ errors.category }}</p>
+    {% endif %}
+  </div>
+</div>
+
+<p class="form-section-header">Purchase details</p>
+
+<div class="pill-field-row">
+  <div class="pill-field">
+    <span class="pill-field-label">Date purchased</span>
+    <input
+      type="date"
+      id="date_purchased"
+      name="date_purchased"
+      class="pill-field-input{{ ' has-error' if errors and errors.date_purchased }}"
+      value="{{ values.get('date_purchased', '') }}"
+      required
+    >
+    {% if errors and errors.date_purchased %}
+    <p class="error-message"><i class="ti ti-alert-circle"></i>{{ errors.date_purchased }}</p>
+    {% endif %}
+  </div>
+  <div class="pill-field">
+    <span class="pill-field-label">Price paid</span>
+    <input
+      type="number"
+      id="price_purchased"
+      name="price_purchased"
+      class="pill-field-input{{ ' has-error' if errors and errors.price_purchased }}"
+      placeholder="450.00"
+      step="0.01"
+      min="0"
+      value="{{ values.get('price_purchased', '') }}"
+      required
+    >
+    {% if errors and errors.price_purchased %}
+    <p class="error-message"><i class="ti ti-alert-circle"></i>{{ errors.price_purchased }}</p>
+    {% endif %}
+  </div>
+</div>
+
+<div class="pill-field">
+  <span class="pill-field-label">Retailer</span>
+  <input
+    type="text"
+    id="retailer"
+    name="retailer"
+    class="pill-field-input"
+    placeholder="Nordstrom"
+    value="{{ values.get('retailer', '') }}"
+  >
+</div>
+
+<p class="form-section-header dynamic-fields-header" data-dynamic-fields-header style="display:none;">
+  <span data-dynamic-fields-category-label></span> details
+</p>
+
+<div data-dynamic-fields>
+  <div class="pill-field dynamic-fields-section" data-field-wrap="size">
+    <span class="pill-field-label">Size</span>
+    <input type="text" name="size" class="pill-field-input" placeholder="M" value="{{ values.get('size', '') }}">
+  </div>
+  <div class="pill-field dynamic-fields-section" data-field-wrap="material">
+    <span class="pill-field-label">Material</span>
+    <input type="text" name="material" class="pill-field-input" placeholder="Leather" value="{{ values.get('material', '') }}">
+  </div>
+  <div class="pill-field dynamic-fields-section" data-field-wrap="color">
+    <span class="pill-field-label">Color</span>
+    <input type="text" name="color" class="pill-field-input" placeholder="Black" value="{{ values.get('color', '') }}">
+  </div>
+  <div class="pill-field dynamic-fields-section" data-field-wrap="dimensions">
+    <span class="pill-field-label">Dimensions</span>
+    <input type="text" name="dimensions" class="pill-field-input" placeholder="12in x 8in x 4in" value="{{ values.get('dimensions', '') }}">
+  </div>
+  <div class="pill-field dynamic-fields-section" data-field-wrap="storage_capacity">
+    <span class="pill-field-label">Storage capacity</span>
+    <input type="text" name="storage_capacity" class="pill-field-input" placeholder="256GB" value="{{ values.get('storage_capacity', '') }}">
+  </div>
+</div>
+
+<p class="form-section-header">Condition</p>
+
+<div class="pill-field">
+  <span class="pill-field-label">Condition</span>
+  <select id="condition" name="condition" class="pill-field-input">
+    <option value="" {{ 'selected' if not values.get('condition') }}>Select condition</option>
+    <option value="new" {{ 'selected' if values.get('condition') == 'new' }}>New</option>
+    <option value="like_new" {{ 'selected' if values.get('condition') == 'like_new' }}>Like New</option>
+    <option value="good" {{ 'selected' if values.get('condition') == 'good' }}>Good</option>
+    <option value="fair" {{ 'selected' if values.get('condition') == 'fair' }}>Fair</option>
+  </select>
+</div>
+
+<p class="form-section-header">Description</p>
+
+<div class="pill-field">
+  <span class="pill-field-label">Description</span>
+  <textarea id="description" name="description" class="pill-field-input">{{ values.get('description', '') }}</textarea>
+</div>
