@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}{{ ci.item.name }} — cache{% endblock %}
+{% block content %}
+<div class="header-bar">
+  <a href="{{ url_for('collections.public_collection', share_token=collection.share_token) }}" class="back-link"><i class="ti ti-arrow-left"></i></a>
+  <span class="wordmark" style="font-size:13px;">cache</span>
+  <span style="width:16px;"></span>
+</div>
+
+<div class="item-photo-full" style="background-image:url('{{ ci.item.photo_url }}');"></div>
+
+<div class="item-detail-body">
+  <p class="item-detail-name">{{ ci.item.name }}</p>
+  <p class="item-detail-meta">
+    {%- if ci.item.brand %}{{ ci.item.brand }} · {% endif -%}
+    From <a href="{{ url_for('collections.public_collection', share_token=collection.share_token) }}" class="link-secondary">{{ collection.name }}</a>
+  </p>
+
+  <div class="item-stats-row">
+    <div>
+      <p class="item-stat-label">PAID</p>
+      <p class="item-stat-value">${{ '{:,.0f}'.format(ci.item.price_purchased) }}</p>
+    </div>
+    <div>
+      <p class="item-stat-label">ASKING</p>
+      <p class="item-stat-value resale">${{ '{:,.0f}'.format(ci.effective_price) }}</p>
+    </div>
+  </div>
+
+  {% if ci.item.description %}
+  <p class="item-detail-description">{{ ci.item.description }}</p>
+  {% endif %}
+
+  <span class="category-tag">{{ ci.item.category }}</span>
+</div>
+
+<p class="public-footer">
+  Made with <span class="wordmark-inline">cache</span>
+</p>
+{% endblock %}

@@ -1071,7 +1071,11 @@ textarea.field-input {
   color: var(--color-text);
 }
 
-.collection-item-card a {
+/* Owner view wraps a nested <a> (photo/name only — price editing lives
+   outside the link); the public page's card IS the <a> itself, since
+   the whole thing is just a link there. Both need the same reset. */
+.collection-item-card a,
+a.collection-item-card {
   text-decoration: none;
   color: inherit;
   display: block;
@@ -1324,4 +1328,11 @@ textarea.field-input {
   font-size: 10px;
   color: var(--color-muted);
   margin-top: 40px;
+}
+
+.public-filters-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 0 18px;
+  margin-bottom: 12px;
 }

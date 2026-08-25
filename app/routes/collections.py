@@ -100,4 +100,27 @@ def public_collection(share_token):
     enumerate every other collection in the app."""
     collection = Collection.query.filter_by(share_token=share_token).first_or_404()
     items = [ci for ci in collection.collection_items]
-    return render_template("collections/public.html", collection=collection, collection_items=items)
+    categories = sorted({ci.item.category for ci in items})
+    return render_template(
+        "collections/public.html",
+        collection=collection,
+        collection_items=items,
+        categories=categories,
+    )
+
+
+@collections_bp.route("/c/<share_token>/item/<int:item_id>")
+def public_item_detail(share_token, item_id):
+    """Also public/unauthenticated, and also scoped by share_token rather
+    than trusting item_id alone — otherwise this route would let anyone
+    view any item in the app just by guessing ids, whether or not its
+    owner ever shared the collection it's in."""
+    collection = Collection.query.filter_by(share_token=share_token).first_or_404()
+    collection_item = CollectionItem.query.filter_by(
+        collection_id=collection.id, item_id=item_id
+    ).first_or_404()
+    return render_template(
+        "collections/public_item.html",
+        collection=collection,
+        ci=collection_item,
+    )
