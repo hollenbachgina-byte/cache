@@ -16,7 +16,7 @@
   </div>
 </div>
 
-<div class="collection-info-block">
+<div class="collection-info-block collection-info-block-centered">
   <h1 class="collection-name">{{ collection.name }}</h1>
   <span class="created-tag">Created {{ collection.created_at.strftime('%b %Y') }}</span>
   {% if collection.description %}
@@ -30,6 +30,7 @@
     <textarea name="description" placeholder="Add a short description (optional)">{{ collection.description or '' }}</textarea>
     <button type="submit">Save</button>
   </form>
+  <button type="button" class="delete-collection-link" data-open-delete-collection-modal>Delete Collection</button>
 </div>
 
 <div id="collection-items-scope">
@@ -65,25 +66,15 @@
         <i class="ti ti-x"></i>
       </button>
       <a href="/item/{{ ci.item.id }}">
-        <div class="item-card-photo" style="background-image:url('{{ ci.item.photo_url }}');"></div>
+        <div class="item-card-photo" style="background-image:url('{{ ci.item.photo_url }}');">
+          <span class="item-card-category-overlay">{{ ci.item.category }}</span>
+        </div>
         <p class="item-card-name">{{ ci.item.name }}</p>
+        <div class="item-card-prices">
+          <span class="price-pill">${{ '{:,.0f}'.format(ci.item.displayed_resale_value) }}</span>
+          <span class="price-struck">${{ '{:,.0f}'.format(ci.item.price_purchased) }}</span>
+        </div>
       </a>
-      <div class="asking-price-display" data-price-display="{{ ci.item_id }}">
-        <span>${{ '{:,.0f}'.format(ci.effective_price) }}</span>
-        <button type="button" class="price-edit-icon" data-toggle-price-edit="{{ ci.item_id }}" aria-label="Edit asking price">
-          <i class="ti ti-pencil"></i>
-        </button>
-      </div>
-      <form
-        method="post"
-        action="{{ url_for('collections.update_asking_price', collection_id=collection.id, item_id=ci.item_id) }}"
-        class="asking-price-form"
-        data-price-form="{{ ci.item_id }}"
-        style="display:none;"
-      >
-        <input type="number" name="asking_price" step="0.01" min="0" value="{{ ci.asking_price if ci.asking_price is not none else '' }}" placeholder="{{ '{:,.0f}'.format(ci.item.resale_value) }}">
-        <button type="submit">Save</button>
-      </form>
       <form method="post" action="{{ url_for('collections.remove_item_from_collection', collection_id=collection.id, item_id=ci.item_id) }}" data-remove-form="{{ ci.item_id }}" style="display:none;"></form>
     </div>
     {% endfor %}
@@ -142,17 +133,27 @@
   </div>
 </div>
 
-<div class="modal-overlay" data-share-modal{{ ' style=display:flex;' if just_created }}>
+<div class="modal-overlay" data-share-modal{{ ' style=display:flex;' if request.args.get('share_modal') == '1' }}>
   <div class="modal-card">
-    <div class="success-icon" style="width:48px; height:48px; margin-bottom:14px;"><i class="ti ti-check"></i></div>
-    <p class="modal-title">Success!</p>
-    <p class="modal-header-text">Here's a link to your new collection.</p>
-    <p class="modal-body">Share wherever you want</p>
+    <p class="modal-title">Share this collection</p>
+    <label class="toggle-switch-row" style="margin-bottom:14px;">
+      <span>Public</span>
+      <span class="toggle-switch">
+        <input type="checkbox" data-visibility-toggle-checkbox{{ ' checked' if collection.is_public }}>
+        <span class="toggle-switch-track"></span>
+      </span>
+    </label>
+    <form method="post" action="{{ url_for('collections.toggle_visibility', collection_id=collection.id) }}" data-visibility-form style="display:none;"></form>
+
+    {% if collection.is_public and share_url %}
     <div class="share-url-box">
       <input type="text" value="{{ share_url }}" readonly data-share-url-input>
       <button type="button" data-copy-share-url aria-label="Copy link"><i class="ti ti-copy"></i></button>
     </div>
     <p class="share-copied-note" data-copied-note style="visibility:hidden;">Copied!</p>
+    {% else %}
+    <p class="modal-body">Turn this on to get a shareable link.</p>
+    {% endif %}
     <button type="button" class="btn-outline" data-close-share-modal style="margin-top:12px;">Close</button>
   </div>
 </div>
@@ -164,6 +165,18 @@
     <p class="modal-body">It stays in your Cache — this only takes it out of this collection.</p>
     <button type="button" class="btn-danger" data-confirm-remove>Remove item</button>
     <button type="button" class="btn-outline" data-close-remove-modal>Cancel</button>
+  </div>
+</div>
+
+<div class="modal-overlay" data-delete-collection-modal>
+  <div class="modal-card">
+    <div class="modal-icon-circle"><i class="ti ti-trash"></i></div>
+    <p class="modal-title">Delete this collection?</p>
+    <p class="modal-body">This can't be undone.</p>
+    <form method="post" action="{{ url_for('collections.delete_collection', collection_id=collection.id) }}">
+      <button type="submit" class="btn-danger">Delete collection</button>
+    </form>
+    <button type="button" class="btn-outline" data-close-delete-collection-modal>Cancel</button>
   </div>
 </div>
 {% endblock %}
@@ -257,21 +270,6 @@
       });
     }
 
-    // Per-item asking-price inline edit toggle
-    document.querySelectorAll("[data-toggle-price-edit]").forEach(function (btn) {
-      btn.addEventListener("click", function () {
-        var itemId = btn.getAttribute("data-toggle-price-edit");
-        var display = document.querySelector('[data-price-display="' + itemId + '"]');
-        var form = document.querySelector('[data-price-form="' + itemId + '"]');
-        if (display) display.style.display = "none";
-        if (form) {
-          form.style.display = "flex";
-          var input = form.querySelector("input");
-          if (input) input.focus();
-        }
-      });
-    });
-
     // Remove-from-collection confirmation
     var removeModal = document.querySelector("[data-remove-modal]");
     var pendingRemoveItemId = null;
@@ -297,7 +295,22 @@
       });
     }
 
-    // Share modal
+    // Delete-collection confirmation
+    var deleteCollectionModal = document.querySelector("[data-delete-collection-modal]");
+    var openDeleteCollectionBtn = document.querySelector("[data-open-delete-collection-modal]");
+    var closeDeleteCollectionBtn = document.querySelector("[data-close-delete-collection-modal]");
+    if (openDeleteCollectionBtn && deleteCollectionModal) {
+      openDeleteCollectionBtn.addEventListener("click", function () {
+        deleteCollectionModal.classList.add("open");
+      });
+    }
+    if (closeDeleteCollectionBtn && deleteCollectionModal) {
+      closeDeleteCollectionBtn.addEventListener("click", function () {
+        deleteCollectionModal.classList.remove("open");
+      });
+    }
+
+    // Share modal + visibility toggle
     var shareModal = document.querySelector("[data-share-modal]");
     var openShareBtn = document.querySelector("[data-open-share-modal]");
     var closeShareBtn = document.querySelector("[data-close-share-modal]");
@@ -311,6 +324,14 @@
       closeShareBtn.addEventListener("click", function () {
         shareModal.classList.remove("open");
         shareModal.style.display = "none";
+      });
+    }
+
+    var visibilityCheckbox = document.querySelector("[data-visibility-toggle-checkbox]");
+    var visibilityForm = document.querySelector("[data-visibility-form]");
+    if (visibilityCheckbox && visibilityForm) {
+      visibilityCheckbox.addEventListener("change", function () {
+        visibilityForm.submit();
       });
     }
 

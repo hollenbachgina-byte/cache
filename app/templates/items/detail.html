@@ -47,7 +47,22 @@
     </div>
     <div>
       <p class="item-stat-label">RESALE EST.</p>
-      <span class="price-pill">${{ '{:,.0f}'.format(item.resale_value) }}</span>
+      <div class="resale-override-display" data-resale-display>
+        <span class="price-pill">${{ '{:,.0f}'.format(item.displayed_resale_value) }}</span>
+        <button type="button" class="price-edit-icon" data-toggle-resale-edit aria-label="Edit resale value">
+          <i class="ti ti-pencil"></i>
+        </button>
+      </div>
+      <form
+        method="post"
+        action="{{ url_for('items.update_resale_override', item_id=item.id) }}"
+        class="asking-price-form"
+        data-resale-form
+        style="display:none;"
+      >
+        <input type="number" name="resale_price_override" step="0.01" min="0" value="{{ item.resale_price_override if item.resale_price_override is not none else '' }}" placeholder="{{ '{:,.0f}'.format(item.resale_value) }}">
+        <button type="submit">Save</button>
+      </form>
     </div>
   </div>
 
@@ -100,6 +115,18 @@
     if (closeModalBtn && modal) {
       closeModalBtn.addEventListener("click", function () {
         modal.classList.remove("open");
+      });
+    }
+
+    var resaleToggle = document.querySelector("[data-toggle-resale-edit]");
+    var resaleDisplay = document.querySelector("[data-resale-display]");
+    var resaleForm = document.querySelector("[data-resale-form]");
+    if (resaleToggle && resaleDisplay && resaleForm) {
+      resaleToggle.addEventListener("click", function () {
+        resaleDisplay.style.display = "none";
+        resaleForm.style.display = "flex";
+        var input = resaleForm.querySelector("input");
+        if (input) input.focus();
       });
     }
   });

@@ -47,6 +47,10 @@ class Item(db.Model):
     dimensions = db.Column(db.String(100), nullable=True)
     storage_capacity = db.Column(db.String(50), nullable=True)
     condition = db.Column(db.Enum(ItemCondition), nullable=True)
+    # Owner-set asking price — overrides the computed resale_value
+    # everywhere it's displayed (item detail, dashboard, every collection
+    # this item is in, public share view) until cleared.
+    resale_price_override = db.Column(db.Numeric(10, 2), nullable=True)
     status = db.Column(db.Enum(ItemStatus), nullable=False, default=ItemStatus.captured)
     source = db.Column(db.Enum(ItemSource), nullable=False, default=ItemSource.manual)
     # Archived = hidden from the default dashboard view, reversible. A
@@ -65,8 +69,18 @@ class Item(db.Model):
     def resale_value(self):
         """Computed live, never persisted — a category's multiplier is looked
         up (falling back to 'default') at every render, so admin changes to
-        ResaleRate apply retroactively with no recompute job."""
+        ResaleRate apply retroactively with no recompute job. This is the
+        pure computed value; use displayed_resale_value for what should
+        actually render (respects an owner-set override)."""
         from app.models.resale_rate import ResaleRate
 
         multiplier = Decimal(str(ResaleRate.multiplier_for(self.category)))
         return (self.price_purchased * multiplier).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+    @property
+    def displayed_resale_value(self):
+        """resale_price_override if the owner has set one, else the computed
+        resale_value — this is what every screen should actually render."""
+        if self.resale_price_override is not None:
+            return self.resale_price_override
+        return self.resale_value

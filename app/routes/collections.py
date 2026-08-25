@@ -1,10 +1,9 @@
-from decimal import Decimal, InvalidOperation
-
 from flask import Blueprint, abort, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
 from app import db
 from app.models import Collection, CollectionItem, Item
+from app.models.collection import generate_share_token
 
 collections_bp = Blueprint("collections", __name__)
 
@@ -27,7 +26,7 @@ def create_collection():
     collection = Collection(user_id=current_user.id, name=name, description=description or None)
     db.session.add(collection)
     db.session.commit()
-    return redirect(url_for("collections.collection_detail", collection_id=collection.id, created=1))
+    return redirect(url_for("collections.collection_detail", collection_id=collection.id))
 
 
 @collections_bp.route("/collections/<int:collection_id>")
@@ -42,8 +41,9 @@ def collection_detail(collection_id):
         available_query = available_query.filter(~Item.id.in_(in_collection_ids))
     available_items = available_query.order_by(Item.created_at.desc()).all()
 
-    share_url = url_for("collections.public_collection", share_token=collection.share_token, _external=True)
-    just_created = request.args.get("created") == "1"
+    share_url = None
+    if collection.is_public and collection.share_token:
+        share_url = url_for("collections.public_collection", share_token=collection.share_token, _external=True)
 
     return render_template(
         "collections/detail.html",
@@ -51,7 +51,6 @@ def collection_detail(collection_id):
         items=items,
         available_items=available_items,
         share_url=share_url,
-        just_created=just_created,
     )
 
 
@@ -66,6 +65,28 @@ def edit_collection(collection_id):
         collection.description = description or None
         db.session.commit()
     return redirect(url_for("collections.collection_detail", collection_id=collection.id))
+
+
+@collections_bp.route("/collections/<int:collection_id>/toggle_visibility", methods=["POST"])
+@login_required
+def toggle_visibility(collection_id):
+    collection = _get_owned_collection_or_404(collection_id)
+    collection.is_public = not collection.is_public
+    if collection.is_public:
+        collection.share_token = generate_share_token()
+    else:
+        collection.share_token = None  # invalidates any existing link immediately
+    db.session.commit()
+    return redirect(url_for("collections.collection_detail", collection_id=collection.id, share_modal=1))
+
+
+@collections_bp.route("/collections/<int:collection_id>/delete", methods=["POST"])
+@login_required
+def delete_collection(collection_id):
+    collection = _get_owned_collection_or_404(collection_id)
+    db.session.delete(collection)  # cascades to CollectionItem rows only — Items are untouched
+    db.session.commit()
+    return redirect(url_for("profile.profile"))
 
 
 @collections_bp.route("/collections/<int:collection_id>/add_item", methods=["POST"])
@@ -96,34 +117,14 @@ def remove_item_from_collection(collection_id, item_id):
     return redirect(url_for("collections.collection_detail", collection_id=collection.id))
 
 
-@collections_bp.route("/collections/<int:collection_id>/item/<int:item_id>/price", methods=["POST"])
-@login_required
-def update_asking_price(collection_id, item_id):
-    collection = _get_owned_collection_or_404(collection_id)
-    collection_item = CollectionItem.query.filter_by(
-        collection_id=collection.id, item_id=item_id
-    ).first_or_404()
-
-    raw_price = request.form.get("asking_price", "").strip()
-    if raw_price:
-        try:
-            collection_item.asking_price = Decimal(raw_price)
-        except InvalidOperation:
-            pass
-    else:
-        collection_item.asking_price = None  # blank clears the override, back to computed resale_value
-
-    db.session.commit()
-    return redirect(url_for("collections.collection_detail", collection_id=collection.id))
-
-
 @collections_bp.route("/c/<share_token>")
 def public_collection(share_token):
-    """Public, unauthenticated view — anyone with the link can see this,
-    by design. Looked up by the random share_token, never by the
-    sequential id, so a shared collection doesn't expose the ability to
-    enumerate every other collection in the app."""
-    collection = Collection.query.filter_by(share_token=share_token).first_or_404()
+    """Public, unauthenticated view — reachable only while the collection's
+    owner has it toggled on. Looked up by the random share_token, never by
+    the sequential id (guessable), and is_public is checked explicitly too
+    even though toggling off already clears the token — belt and suspenders
+    against any future path that might leave a stale token in place."""
+    collection = Collection.query.filter_by(share_token=share_token, is_public=True).first_or_404()
     items = [ci for ci in collection.collection_items]
     categories = sorted({ci.item.category for ci in items})
     return render_template(
@@ -140,7 +141,7 @@ def public_item_detail(share_token, item_id):
     than trusting item_id alone — otherwise this route would let anyone
     view any item in the app just by guessing ids, whether or not its
     owner ever shared the collection it's in."""
-    collection = Collection.query.filter_by(share_token=share_token).first_or_404()
+    collection = Collection.query.filter_by(share_token=share_token, is_public=True).first_or_404()
     collection_item = CollectionItem.query.filter_by(
         collection_id=collection.id, item_id=item_id
     ).first_or_404()

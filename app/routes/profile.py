@@ -14,7 +14,7 @@ profile_bp = Blueprint("profile", __name__)
 @login_required
 def profile():
     items = Item.query.filter_by(user_id=current_user.id).all()
-    cache_value = sum((item.resale_value for item in items), Decimal("0.00"))
+    cache_value = sum((item.displayed_resale_value for item in items), Decimal("0.00"))
     return render_template("profile/profile.html", cache_value=cache_value)
 
 

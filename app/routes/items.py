@@ -148,8 +148,8 @@ def add_item():
     db.session.commit()
 
     all_items = Item.query.filter_by(user_id=current_user.id).all()
-    new_total = sum((i.resale_value for i in all_items), Decimal("0.00"))
-    delta = item.resale_value
+    new_total = sum((i.displayed_resale_value for i in all_items), Decimal("0.00"))
+    delta = item.displayed_resale_value
     previous_total = new_total - delta
 
     return render_template(
@@ -260,5 +260,21 @@ def delete_item(item_id):
 def toggle_archived(item_id):
     item = _get_owned_item_or_404(item_id)
     item.is_archived = not item.is_archived
+    db.session.commit()
+    return redirect(url_for("items.item_detail", item_id=item.id))
+
+
+@items_bp.route("/item/<int:item_id>/resale_override", methods=["POST"])
+@login_required
+def update_resale_override(item_id):
+    item = _get_owned_item_or_404(item_id)
+    raw_price = request.form.get("resale_price_override", "").strip()
+    if raw_price:
+        try:
+            item.resale_price_override = Decimal(raw_price)
+        except InvalidOperation:
+            pass
+    else:
+        item.resale_price_override = None  # blank clears the override, back to computed resale_value
     db.session.commit()
     return redirect(url_for("items.item_detail", item_id=item.id))

@@ -49,15 +49,20 @@
     {% for ci in collection_items %}
     <a
       href="{{ url_for('collections.public_item_detail', share_token=collection.share_token, item_id=ci.item_id) }}"
-      class="collection-item-card"
+      class="collection-item-card{{ ' item-sold' if ci.item.is_archived }}"
       data-item-row
       data-category="{{ ci.item.category }}"
     >
-      <div class="item-card-photo" style="background-image:url('{{ ci.item.photo_url }}');"></div>
+      <div class="item-card-photo" style="background-image:url('{{ ci.item.photo_url }}');">
+        <span class="item-card-category-overlay">{{ ci.item.category }}</span>
+        {% if ci.item.is_archived %}
+        <span class="sold-badge">SOLD</span>
+        {% endif %}
+      </div>
       <p class="item-card-name">{{ ci.item.name }}</p>
       <div class="public-item-prices">
         <span class="public-item-paid">Paid ${{ '{:,.0f}'.format(ci.item.price_purchased) }}</span>
-        <span class="public-item-asking">Asking ${{ '{:,.0f}'.format(ci.effective_price) }}</span>
+        <span class="public-item-asking">Asking ${{ '{:,.0f}'.format(ci.item.displayed_resale_value) }}</span>
       </div>
     </a>
     {% endfor %}

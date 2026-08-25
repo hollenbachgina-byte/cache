@@ -7,9 +7,16 @@
   <span style="width:16px;"></span>
 </div>
 
-<div class="item-photo-full" style="background-image:url('{{ ci.item.photo_url }}');"></div>
+<div class="item-photo-full" style="background-image:url('{{ ci.item.photo_url }}');">
+  {% if ci.item.is_archived %}
+  <span class="sold-badge sold-badge-large">SOLD</span>
+  {% endif %}
+</div>
 
 <div class="item-detail-body">
+  {% if ci.item.is_archived %}
+  <span class="archived-badge">Sold</span>
+  {% endif %}
   <p class="item-detail-name">{{ ci.item.name }}</p>
   <p class="item-detail-meta">
     {%- if ci.item.brand %}{{ ci.item.brand }} · {% endif -%}
@@ -23,7 +30,7 @@
     </div>
     <div>
       <p class="item-stat-label">ASKING</p>
-      <p class="item-stat-value resale">${{ '{:,.0f}'.format(ci.effective_price) }}</p>
+      <p class="item-stat-value resale">${{ '{:,.0f}'.format(ci.item.displayed_resale_value) }}</p>
     </div>
   </div>
 
