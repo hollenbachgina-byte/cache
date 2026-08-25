@@ -1106,6 +1106,29 @@ textarea.field-input {
   padding: 0;
 }
 
+.collection-row-wrap {
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.collection-row-delete-action {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 64px;
+  background: var(--color-error);
+  color: #fff;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  cursor: pointer;
+}
+
 .collection-row {
   background: #fff;
   border-radius: 10px;
@@ -1113,9 +1136,11 @@ textarea.field-input {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 6px;
   text-decoration: none;
   color: var(--color-text);
+  position: relative;
+  z-index: 1;
+  touch-action: pan-y;
 }
 
 .collection-row .ti {

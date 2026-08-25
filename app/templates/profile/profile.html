@@ -58,20 +58,37 @@
 
     {% if current_user.collections %}
       {% for collection in current_user.collections %}
-      <a href="{{ url_for('collections.collection_detail', collection_id=collection.id) }}" class="collection-row">
-        <span>{{ collection.name }}</span>
-        <i class="ti ti-chevron-right"></i>
-      </a>
+      <div class="collection-row-wrap">
+        <button type="button" class="collection-row-delete-action" data-open-delete-collection-modal="{{ collection.id }}" aria-label="Delete collection">
+          <i class="ti ti-trash"></i>
+        </button>
+        <a href="{{ url_for('collections.collection_detail', collection_id=collection.id) }}" class="collection-row" data-swipeable>
+          <span>{{ collection.name }}</span>
+          <i class="ti ti-chevron-right"></i>
+        </a>
+        <form method="post" action="{{ url_for('collections.delete_collection', collection_id=collection.id) }}" data-delete-collection-form="{{ collection.id }}" style="display:none;"></form>
+      </div>
       {% endfor %}
     {% else %}
     <p class="empty-collections">No collections yet.</p>
     {% endif %}
   </div>
 </div>
+
+<div class="modal-overlay" data-delete-collection-modal>
+  <div class="modal-card">
+    <div class="modal-icon-circle"><i class="ti ti-trash"></i></div>
+    <p class="modal-title">Delete this collection?</p>
+    <p class="modal-body">This can't be undone.</p>
+    <button type="button" class="btn-danger" data-confirm-delete-collection>Delete collection</button>
+    <button type="button" class="btn-outline" data-close-delete-collection-modal>Cancel</button>
+  </div>
+</div>
 {% endblock %}
 
 {% block extra_scripts %}
 <script src="{{ url_for('static', filename='js/image-compress.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/swipe-delete.js') }}" defer></script>
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     var toggle = document.querySelector("[data-toggle-create-collection]");
@@ -90,6 +107,30 @@
         nameDisplay.style.display = "none";
         nameEditForm.style.display = "flex";
         nameEditForm.querySelector("input").focus();
+      });
+    }
+
+    var deleteCollectionModal = document.querySelector("[data-delete-collection-modal]");
+    var pendingDeleteCollectionId = null;
+    document.querySelectorAll("[data-open-delete-collection-modal]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        pendingDeleteCollectionId = btn.getAttribute("data-open-delete-collection-modal");
+        if (deleteCollectionModal) deleteCollectionModal.classList.add("open");
+      });
+    });
+    var closeDeleteCollectionBtn = document.querySelector("[data-close-delete-collection-modal]");
+    if (closeDeleteCollectionBtn && deleteCollectionModal) {
+      closeDeleteCollectionBtn.addEventListener("click", function () {
+        deleteCollectionModal.classList.remove("open");
+        pendingDeleteCollectionId = null;
+      });
+    }
+    var confirmDeleteCollectionBtn = document.querySelector("[data-confirm-delete-collection]");
+    if (confirmDeleteCollectionBtn) {
+      confirmDeleteCollectionBtn.addEventListener("click", function () {
+        if (!pendingDeleteCollectionId) return;
+        var form = document.querySelector('[data-delete-collection-form="' + pendingDeleteCollectionId + '"]');
+        if (form) form.submit();
       });
     }
   });
