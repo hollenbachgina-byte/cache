@@ -69,12 +69,28 @@ run.py
 - `brand` (string, nullable)
 - `date_purchased` (date)
 - `price_purchased` (decimal)
+- `retailer` (string, nullable — added Feedback Round 2, "Purchase details" section of the Add Item form)
 - `photo_url` (string — Supabase Storage public URL)
 - `description` (text, nullable)
 - `category` (string — matches `ResaleRate.category`)
+- `size` / `material` / `color` / `dimensions` / `storage_capacity` (all string, nullable — added Feedback Round 2. Plain columns, not a separate attributes table; which ones the Add/Edit form shows is UI logic, driven by the category→field mapping below)
+- `condition` (enum: `New`, `Like New`, `Good`, `Fair`, nullable — added Feedback Round 2, shown on every category regardless of the mapping below)
 - `status` (enum: `Captured`, `Surfaced`, `Listed`, `Sold` — always `Captured` in Phase 1, but define all four now)
 - `source` (enum: `manual`, `auto` — always `manual` in Phase 1)
+- `is_archived` (boolean, default `false` — added Feedback Round 2. Independent of `status`: archiving hides an item from the default dashboard view and is reversible, not a sell-lifecycle state)
 - `created_at` (datetime, default now)
+
+**Category → attribute field mapping** (Feedback Round 2, Section 9 — drives which fields the Add/Edit item form shows; `condition` and the base fields above are always shown regardless of category):
+
+| Category | Fields shown |
+|---|---|
+| Clothing | Size, Material, Color |
+| Shoes | Size, Material, Color |
+| Bags | Material, Dimensions, Color |
+| Accessories | Size, Dimensions, Material, Color |
+| Electronics | Storage capacity |
+| Home | Dimensions, Material |
+| Watches, Jewelry, Other | — (section omitted entirely) |
 
 **ResaleRate** (admin-managed via Flask-Admin, not user-facing)
 - `category` (string, unique — include a `default` row as fallback)
