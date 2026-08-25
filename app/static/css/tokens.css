@@ -1698,7 +1698,7 @@ textarea.pill-field-input {
   top: 50%;
   right: max(0px, calc((100vw - 480px) / 2));
   transform: translateY(-50%);
-  background: var(--color-secondary);
+  background: var(--color-accent);
   border: none;
   padding: 12px 7px;
   border-radius: 6px 0 0 6px;
