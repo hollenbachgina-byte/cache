@@ -11,12 +11,10 @@ from app.services.storage import PhotoUploadError, delete_item_photo, upload_pho
 items_bp = Blueprint("items", __name__)
 
 PRESET_CATEGORIES = [
-    "Watches",
-    "Bags",
-    "Shoes",
     "Clothing",
+    "Shoes",
+    "Bags",
     "Accessories",
-    "Jewelry",
     "Electronics",
     "Home",
     "Other",
