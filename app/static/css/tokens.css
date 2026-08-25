@@ -36,6 +36,12 @@ body {
   box-shadow: 0 0 40px rgba(38, 5, 3, 0.08);
 }
 
+.top-bar {
+  height: 18px;
+  background: var(--color-primary);
+  flex-shrink: 0;
+}
+
 .wordmark {
   font-family: var(--font-wordmark);
   font-weight: 900;
@@ -241,7 +247,7 @@ body {
 /* Dashboard */
 .dashboard-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   padding: 16px 18px 0;
 }
