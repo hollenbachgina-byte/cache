@@ -55,6 +55,19 @@ def collection_detail(collection_id):
     )
 
 
+@collections_bp.route("/collections/<int:collection_id>/edit", methods=["POST"])
+@login_required
+def edit_collection(collection_id):
+    collection = _get_owned_collection_or_404(collection_id)
+    name = request.form.get("name", "").strip()
+    description = request.form.get("description", "").strip()
+    if name:
+        collection.name = name
+        collection.description = description or None
+        db.session.commit()
+    return redirect(url_for("collections.collection_detail", collection_id=collection.id))
+
+
 @collections_bp.route("/collections/<int:collection_id>/add_item", methods=["POST"])
 @login_required
 def add_item_to_collection(collection_id):
@@ -67,6 +80,18 @@ def add_item_to_collection(collection_id):
         if item:
             db.session.add(CollectionItem(collection_id=collection.id, item_id=item.id))
 
+    db.session.commit()
+    return redirect(url_for("collections.collection_detail", collection_id=collection.id))
+
+
+@collections_bp.route("/collections/<int:collection_id>/item/<int:item_id>/remove", methods=["POST"])
+@login_required
+def remove_item_from_collection(collection_id, item_id):
+    collection = _get_owned_collection_or_404(collection_id)
+    collection_item = CollectionItem.query.filter_by(
+        collection_id=collection.id, item_id=item_id
+    ).first_or_404()
+    db.session.delete(collection_item)  # unlinks only — the Item itself is untouched
     db.session.commit()
     return redirect(url_for("collections.collection_detail", collection_id=collection.id))
 

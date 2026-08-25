@@ -1,67 +1,47 @@
 {% extends "app_base.html" %}
 {% block title %}{{ collection.name }}{% endblock %}
 {% block app_content %}
-<div class="header-bar">
+<div class="header-bar" style="border-bottom:none;">
   <a href="{{ url_for('profile.profile') }}" class="back-link"><i class="ti ti-arrow-left"></i></a>
-  <span style="font-size:15px; font-weight:600;">{{ collection.name }}</span>
-  <div style="display:flex; gap:12px; align-items:center;">
-    <button type="button" class="back-link" data-open-share-modal aria-label="Share" style="background:none; border:none; cursor:pointer;">
+  <div class="collection-header-icons">
+    <button type="button" class="back-link" data-open-share-modal aria-label="Share">
       <i class="ti ti-share"></i>
     </button>
-    <button type="button" class="back-link" data-toggle-add-items aria-label="Add items" style="background:none; border:none; cursor:pointer;">
+    <button type="button" class="back-link" data-toggle-edit-collection aria-label="Edit collection">
+      <i class="ti ti-pencil"></i>
+    </button>
+    <button type="button" class="back-link" data-toggle-add-items aria-label="Add items">
       <i class="ti ti-plus"></i>
     </button>
   </div>
 </div>
 
-{% if collection.description %}
-<p class="collection-description">{{ collection.description }}</p>
-{% endif %}
-
-{% if collection.collection_items %}
-<div class="item-grid">
-  {% for ci in collection.collection_items %}
-  <div class="collection-item-card">
-    <a href="/item/{{ ci.item.id }}">
-      <div class="item-card-photo" style="background-image:url('{{ ci.item.photo_url }}');"></div>
-      <p class="item-card-name">{{ ci.item.name }}</p>
-    </a>
-    <div class="asking-price-display" data-price-display="{{ ci.item_id }}">
-      <span>${{ '{:,.0f}'.format(ci.effective_price) }}</span>
-      <button type="button" class="price-edit-icon" data-toggle-price-edit="{{ ci.item_id }}" aria-label="Edit asking price">
-        <i class="ti ti-pencil"></i>
-      </button>
-    </div>
-    <form
-      method="post"
-      action="{{ url_for('collections.update_asking_price', collection_id=collection.id, item_id=ci.item_id) }}"
-      class="asking-price-form"
-      data-price-form="{{ ci.item_id }}"
-      style="display:none;"
-    >
-      <input type="number" name="asking_price" step="0.01" min="0" value="{{ ci.asking_price if ci.asking_price is not none else '' }}" placeholder="{{ '{:,.0f}'.format(ci.item.resale_value) }}">
-      <button type="submit">Save</button>
-    </form>
-  </div>
-  {% endfor %}
+<div class="collection-info-block">
+  <h1 class="collection-name">{{ collection.name }}</h1>
+  <span class="created-tag">Created {{ collection.created_at.strftime('%b %Y') }}</span>
+  {% if collection.description %}
+  <p class="collection-description">{{ collection.description }}</p>
+  {% endif %}
 </div>
-{% else %}
-<div class="empty-state">
-  <p class="empty-state-title">No items in this collection yet</p>
-  <p class="empty-state-body">Tap + to add items from your Cache.</p>
-</div>
-{% endif %}
 
-<div class="add-items-picker" data-add-items-picker style="display:none;">
-  {% if available_items %}
-  {% set available_categories = available_items|map(attribute='category')|unique|sort %}
-  <div class="add-items-controls">
-    <input type="text" class="field-input" placeholder="Search your items…" data-item-search>
+<div class="edit-collection-panel" data-edit-collection-panel style="display:none;">
+  <form method="post" action="{{ url_for('collections.edit_collection', collection_id=collection.id) }}" class="create-collection-form">
+    <input type="text" name="name" value="{{ collection.name }}" required>
+    <textarea name="description" placeholder="Add a short description (optional)">{{ collection.description or '' }}</textarea>
+    <button type="submit">Save</button>
+  </form>
+</div>
+
+<div id="collection-items-scope">
+  {% if collection.collection_items %}
+  {% set item_categories = collection.collection_items|map(attribute='item')|map(attribute='category')|unique|sort %}
+  {% if item_categories|length > 1 %}
+  <div class="filters-row">
     <div class="filters-wrap">
       <button type="button" class="filters-btn" data-filters-toggle>Filters ▾</button>
       <div class="filters-panel" data-filters-panel>
         <div class="filters-panel-body">
-          {% for category in available_categories %}
+          {% for category in item_categories %}
           <label class="filter-checkbox">
             <input type="checkbox" value="{{ category }}" data-category-filter-checkbox>
             <span class="checkbox-box"></span>
@@ -76,29 +56,98 @@
       </div>
     </div>
   </div>
-
-  <form method="post" action="{{ url_for('collections.add_item_to_collection', collection_id=collection.id) }}">
-    <div data-item-list>
-      {% for item in available_items %}
-      <label class="add-items-picker-item" data-item-row data-name="{{ item.name|lower }}" data-category="{{ item.category }}">
-        <input type="checkbox" name="item_id" value="{{ item.id }}">
-        <img src="{{ item.photo_url }}" alt="">
-        <span>{{ item.name }}</span>
-      </label>
-      {% endfor %}
-    </div>
-    <p class="empty-collections" data-no-matches style="display:none;">No items match.</p>
-    <button type="submit" class="btn-primary" style="margin-top:8px;">Add selected items</button>
-  </form>
-  {% else %}
-  <p class="empty-collections">All your items are already in this collection.</p>
   {% endif %}
+
+  <div class="item-grid">
+    {% for ci in collection.collection_items %}
+    <div class="collection-item-card" data-item-row data-category="{{ ci.item.category }}">
+      <button type="button" class="remove-item-btn" data-open-remove-modal="{{ ci.item_id }}" aria-label="Remove from collection">
+        <i class="ti ti-x"></i>
+      </button>
+      <a href="/item/{{ ci.item.id }}">
+        <div class="item-card-photo" style="background-image:url('{{ ci.item.photo_url }}');"></div>
+        <p class="item-card-name">{{ ci.item.name }}</p>
+      </a>
+      <div class="asking-price-display" data-price-display="{{ ci.item_id }}">
+        <span>${{ '{:,.0f}'.format(ci.effective_price) }}</span>
+        <button type="button" class="price-edit-icon" data-toggle-price-edit="{{ ci.item_id }}" aria-label="Edit asking price">
+          <i class="ti ti-pencil"></i>
+        </button>
+      </div>
+      <form
+        method="post"
+        action="{{ url_for('collections.update_asking_price', collection_id=collection.id, item_id=ci.item_id) }}"
+        class="asking-price-form"
+        data-price-form="{{ ci.item_id }}"
+        style="display:none;"
+      >
+        <input type="number" name="asking_price" step="0.01" min="0" value="{{ ci.asking_price if ci.asking_price is not none else '' }}" placeholder="{{ '{:,.0f}'.format(ci.item.resale_value) }}">
+        <button type="submit">Save</button>
+      </form>
+      <form method="post" action="{{ url_for('collections.remove_item_from_collection', collection_id=collection.id, item_id=ci.item_id) }}" data-remove-form="{{ ci.item_id }}" style="display:none;"></form>
+    </div>
+    {% endfor %}
+  </div>
+  <p class="empty-collections" data-no-matches style="display:none; text-align:center;">No items match.</p>
+  {% else %}
+  <div class="empty-state">
+    <p class="empty-state-title">No items in this collection yet</p>
+    <p class="empty-state-body">Tap + to add items from your Cache.</p>
+  </div>
+  {% endif %}
+</div>
+
+<div id="add-items-scope">
+  <div class="add-items-picker" data-add-items-picker style="display:none;">
+    {% if available_items %}
+    {% set available_categories = available_items|map(attribute='category')|unique|sort %}
+    <div class="add-items-controls">
+      <input type="text" class="field-input" placeholder="Search your items…" data-item-search>
+      <div class="filters-wrap">
+        <button type="button" class="filters-btn" data-filters-toggle>Filters ▾</button>
+        <div class="filters-panel" data-filters-panel>
+          <div class="filters-panel-body">
+            {% for category in available_categories %}
+            <label class="filter-checkbox">
+              <input type="checkbox" value="{{ category }}" data-category-filter-checkbox>
+              <span class="checkbox-box"></span>
+              <span>{{ category }}</span>
+            </label>
+            {% endfor %}
+          </div>
+          <div class="filters-actions">
+            <button type="button" class="btn-clear" data-clear-filters>Clear</button>
+            <button type="button" class="btn-apply" data-apply-filters>Apply</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <form method="post" action="{{ url_for('collections.add_item_to_collection', collection_id=collection.id) }}">
+      <div data-item-list>
+        {% for item in available_items %}
+        <label class="add-items-picker-item" data-item-row data-name="{{ item.name|lower }}" data-category="{{ item.category }}">
+          <input type="checkbox" name="item_id" value="{{ item.id }}">
+          <img src="{{ item.photo_url }}" alt="">
+          <span>{{ item.name }}</span>
+        </label>
+        {% endfor %}
+      </div>
+      <p class="empty-collections" data-no-matches style="display:none;">No items match.</p>
+      <button type="submit" class="btn-primary" style="margin-top:8px;">Add selected items</button>
+    </form>
+    {% else %}
+    <p class="empty-collections">All your items are already in this collection.</p>
+    {% endif %}
+  </div>
 </div>
 
 <div class="modal-overlay" data-share-modal{{ ' style=display:flex;' if just_created }}>
   <div class="modal-card">
-    <p class="modal-title">Success! Here's your new collection link</p>
-    <p class="modal-body">Share wherever you want.</p>
+    <div class="success-icon" style="width:48px; height:48px; margin-bottom:14px;"><i class="ti ti-check"></i></div>
+    <p class="modal-title">Success!</p>
+    <p class="modal-header-text">Here's a link to your new collection.</p>
+    <p class="modal-body">Share wherever you want</p>
     <div class="share-url-box">
       <input type="text" value="{{ share_url }}" readonly data-share-url-input>
       <button type="button" data-copy-share-url aria-label="Copy link"><i class="ti ti-copy"></i></button>
@@ -107,81 +156,104 @@
     <button type="button" class="btn-outline" data-close-share-modal style="margin-top:12px;">Close</button>
   </div>
 </div>
+
+<div class="modal-overlay" data-remove-modal>
+  <div class="modal-card">
+    <div class="modal-icon-circle"><i class="ti ti-x"></i></div>
+    <p class="modal-title">Remove this item?</p>
+    <p class="modal-body">It stays in your Cache — this only takes it out of this collection.</p>
+    <button type="button" class="btn-danger" data-confirm-remove>Remove item</button>
+    <button type="button" class="btn-outline" data-close-remove-modal>Cancel</button>
+  </div>
+</div>
 {% endblock %}
 
 {% block extra_scripts %}
 <script>
   document.addEventListener("DOMContentLoaded", function () {
-    var toggle = document.querySelector("[data-toggle-add-items]");
-    var picker = document.querySelector("[data-add-items-picker]");
-    if (toggle && picker) {
-      toggle.addEventListener("click", function () {
-        picker.style.display = picker.style.display === "none" ? "block" : "none";
-      });
-    }
+    function setupFilterScope(root, opts) {
+      if (!root) return;
+      var filtersToggle = root.querySelector("[data-filters-toggle]");
+      var filtersPanel = root.querySelector("[data-filters-panel]");
+      var searchInput = opts.search ? root.querySelector("[data-item-search]") : null;
+      var categoryCheckboxes = root.querySelectorAll("[data-category-filter-checkbox]");
+      var itemRows = root.querySelectorAll("[data-item-row]");
+      var noMatches = root.querySelector("[data-no-matches]");
+      var clearBtn = root.querySelector("[data-clear-filters]");
+      var applyBtn = root.querySelector("[data-apply-filters]");
 
-    var filtersToggle = document.querySelector("[data-filters-toggle]");
-    var filtersPanel = document.querySelector("[data-filters-panel]");
-    if (filtersToggle && filtersPanel) {
-      filtersToggle.addEventListener("click", function () {
-        filtersPanel.classList.toggle("open");
-      });
-      document.addEventListener("click", function (event) {
-        if (!filtersPanel.contains(event.target) && !filtersToggle.contains(event.target)) {
-          filtersPanel.classList.remove("open");
+      if (filtersToggle && filtersPanel) {
+        filtersToggle.addEventListener("click", function () {
+          filtersPanel.classList.toggle("open");
+        });
+        document.addEventListener("click", function (event) {
+          if (!filtersPanel.contains(event.target) && !filtersToggle.contains(event.target)) {
+            filtersPanel.classList.remove("open");
+          }
+        });
+      }
+
+      function selectedCategories() {
+        var selected = [];
+        categoryCheckboxes.forEach(function (cb) {
+          if (cb.checked) selected.push(cb.value);
+        });
+        return selected;
+      }
+
+      function applyFilters() {
+        var query = searchInput ? (searchInput.value || "").trim().toLowerCase() : "";
+        var categories = selectedCategories();
+        var visibleCount = 0;
+
+        itemRows.forEach(function (row) {
+          var matchesSearch = !query || (row.dataset.name || "").indexOf(query) !== -1;
+          var matchesCategory = !categories.length || categories.indexOf(row.dataset.category) !== -1;
+          var visible = matchesSearch && matchesCategory;
+          row.style.display = visible ? (opts.rowDisplay || "block") : "none";
+          if (visible) visibleCount++;
+        });
+
+        if (noMatches) noMatches.style.display = visibleCount === 0 ? "block" : "none";
+
+        if (filtersToggle) {
+          filtersToggle.textContent = categories.length ? "Filters (" + categories.length + ") ▾" : "Filters ▾";
+          filtersToggle.classList.toggle("active", categories.length > 0);
         }
-      });
-    }
+      }
 
-    var searchInput = document.querySelector("[data-item-search]");
-    var categoryCheckboxes = document.querySelectorAll("[data-category-filter-checkbox]");
-    var itemRows = document.querySelectorAll("[data-item-row]");
-    var noMatches = document.querySelector("[data-no-matches]");
-    var clearBtn = document.querySelector("[data-clear-filters]");
-    var applyBtn = document.querySelector("[data-apply-filters]");
-    var filtersBtnLabel = filtersToggle;
-
-    function selectedCategories() {
-      var selected = [];
-      categoryCheckboxes.forEach(function (cb) {
-        if (cb.checked) selected.push(cb.value);
-      });
-      return selected;
-    }
-
-    function applyFilters() {
-      var query = (searchInput.value || "").trim().toLowerCase();
-      var categories = selectedCategories();
-      var visibleCount = 0;
-
-      itemRows.forEach(function (row) {
-        var matchesSearch = !query || row.dataset.name.indexOf(query) !== -1;
-        var matchesCategory = !categories.length || categories.indexOf(row.dataset.category) !== -1;
-        var visible = matchesSearch && matchesCategory;
-        row.style.display = visible ? "flex" : "none";
-        if (visible) visibleCount++;
-      });
-
-      if (noMatches) noMatches.style.display = visibleCount === 0 ? "block" : "none";
-
-      if (filtersBtnLabel) {
-        filtersBtnLabel.textContent = categories.length ? "Filters (" + categories.length + ") ▾" : "Filters ▾";
-        filtersBtnLabel.classList.toggle("active", categories.length > 0);
+      if (searchInput) searchInput.addEventListener("input", applyFilters);
+      if (applyBtn) {
+        applyBtn.addEventListener("click", function () {
+          filtersPanel.classList.remove("open");
+          applyFilters();
+        });
+      }
+      if (clearBtn) {
+        clearBtn.addEventListener("click", function () {
+          categoryCheckboxes.forEach(function (cb) { cb.checked = false; });
+          applyFilters();
+          filtersPanel.classList.remove("open");
+        });
       }
     }
 
-    if (searchInput) searchInput.addEventListener("input", applyFilters);
-    if (applyBtn) {
-      applyBtn.addEventListener("click", function () {
-        filtersPanel.classList.remove("open");
-        applyFilters();
+    setupFilterScope(document.querySelector("#collection-items-scope"), { search: false, rowDisplay: "block" });
+    setupFilterScope(document.querySelector("#add-items-scope"), { search: true, rowDisplay: "flex" });
+
+    var addToggle = document.querySelector("[data-toggle-add-items]");
+    var addPicker = document.querySelector("[data-add-items-picker]");
+    if (addToggle && addPicker) {
+      addToggle.addEventListener("click", function () {
+        addPicker.style.display = addPicker.style.display === "none" ? "block" : "none";
       });
     }
-    if (clearBtn) {
-      clearBtn.addEventListener("click", function () {
-        categoryCheckboxes.forEach(function (cb) { cb.checked = false; });
-        applyFilters();
-        filtersPanel.classList.remove("open");
+
+    var editToggle = document.querySelector("[data-toggle-edit-collection]");
+    var editPanel = document.querySelector("[data-edit-collection-panel]");
+    if (editToggle && editPanel) {
+      editToggle.addEventListener("click", function () {
+        editPanel.style.display = editPanel.style.display === "none" ? "block" : "none";
       });
     }
 
@@ -199,6 +271,31 @@
         }
       });
     });
+
+    // Remove-from-collection confirmation
+    var removeModal = document.querySelector("[data-remove-modal]");
+    var pendingRemoveItemId = null;
+    document.querySelectorAll("[data-open-remove-modal]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        pendingRemoveItemId = btn.getAttribute("data-open-remove-modal");
+        if (removeModal) removeModal.classList.add("open");
+      });
+    });
+    var closeRemoveBtn = document.querySelector("[data-close-remove-modal]");
+    if (closeRemoveBtn && removeModal) {
+      closeRemoveBtn.addEventListener("click", function () {
+        removeModal.classList.remove("open");
+        pendingRemoveItemId = null;
+      });
+    }
+    var confirmRemoveBtn = document.querySelector("[data-confirm-remove]");
+    if (confirmRemoveBtn) {
+      confirmRemoveBtn.addEventListener("click", function () {
+        if (!pendingRemoveItemId) return;
+        var form = document.querySelector('[data-remove-form="' + pendingRemoveItemId + '"]');
+        if (form) form.submit();
+      });
+    }
 
     // Share modal
     var shareModal = document.querySelector("[data-share-modal]");

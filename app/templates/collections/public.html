@@ -14,6 +14,9 @@
   </div>
 
   <h1 class="public-collection-name">{{ collection.name }}</h1>
+  <div style="text-align:center; margin-bottom:8px;">
+    <span class="created-tag">Created {{ collection.created_at.strftime('%b %Y') }}</span>
+  </div>
   {% if collection.description %}
   <p class="public-collection-description">{{ collection.description }}</p>
   {% endif %}
