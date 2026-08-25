@@ -7,7 +7,7 @@ from flask_admin import Admin, AdminIndexView
 from flask_admin.contrib.sqla import ModelView
 from flask_admin.theme import Bootstrap4Theme
 
-from app.models import Collection, Item, ResaleRate, User
+from app.models import Collection, Feedback, Item, ResaleRate, User
 
 
 def _check_admin_auth(auth):
@@ -58,6 +58,13 @@ class CollectionAdmin(SecureModelView):
     column_searchable_list = ["name"]
 
 
+class FeedbackAdmin(SecureModelView):
+    column_searchable_list = ["message", "page_context"]
+    column_default_sort = ("created_at", True)
+    can_create = False
+    can_edit = False
+
+
 def init_admin(app, db):
     admin = Admin(
         app,
@@ -69,4 +76,5 @@ def init_admin(app, db):
     admin.add_view(ItemAdmin(Item, db.session))
     admin.add_view(ResaleRateAdmin(ResaleRate, db.session))
     admin.add_view(CollectionAdmin(Collection, db.session))
+    admin.add_view(FeedbackAdmin(Feedback, db.session))
     return admin

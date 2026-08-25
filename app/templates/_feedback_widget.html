@@ -1,0 +1,36 @@
+<button type="button" class="feedback-tab" data-open-feedback-modal aria-label="Send feedback">
+  <span class="feedback-tab-label">Feedback</span>
+</button>
+
+<div class="modal-overlay" data-feedback-modal>
+  <div class="modal-card">
+    <p class="feedback-prompt-line">Something not working?</p>
+    <p class="feedback-prompt-line">Something missing?</p>
+    <p class="feedback-prompt-line feedback-prompt-line-last">Let me know here!</p>
+    <div class="feedback-arrow"><i class="ti ti-arrow-down"></i></div>
+    <form method="post" action="{{ url_for('feedback_widget.submit_feedback') }}" data-feedback-form>
+      <textarea name="message" class="feedback-textarea" placeholder="What's going on?" required></textarea>
+      <input type="hidden" name="page_context" value="{{ request.path }}">
+      <button type="submit" class="btn-primary" style="margin-top:10px;">Send feedback</button>
+    </form>
+    <button type="button" class="btn-outline" data-close-feedback-modal style="margin-top:8px;">Cancel</button>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var openBtn = document.querySelector("[data-open-feedback-modal]");
+    var closeBtn = document.querySelector("[data-close-feedback-modal]");
+    var modal = document.querySelector("[data-feedback-modal]");
+    if (openBtn && modal) {
+      openBtn.addEventListener("click", function () {
+        modal.classList.add("open");
+      });
+    }
+    if (closeBtn && modal) {
+      closeBtn.addEventListener("click", function () {
+        modal.classList.remove("open");
+      });
+    }
+  });
+</script>

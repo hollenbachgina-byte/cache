@@ -2,6 +2,7 @@ from app.models.user import User
 from app.models.item import Item, ItemCondition, ItemSource, ItemStatus
 from app.models.resale_rate import ResaleRate
 from app.models.collection import Collection, CollectionItem
+from app.models.feedback import Feedback
 
 __all__ = [
     "User",
@@ -12,4 +13,5 @@ __all__ = [
     "ResaleRate",
     "Collection",
     "CollectionItem",
+    "Feedback",
 ]

@@ -1691,3 +1691,60 @@ textarea.pill-field-input {
   font-size: 14px;
   padding: 6px 20px;
 }
+
+/* Feedback widget — present on every authenticated screen */
+.feedback-tab {
+  position: fixed;
+  top: 50%;
+  right: max(0px, calc((100vw - 480px) / 2));
+  transform: translateY(-50%);
+  background: var(--color-secondary);
+  border: none;
+  padding: 12px 7px;
+  border-radius: 6px 0 0 6px;
+  cursor: pointer;
+  z-index: 15;
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.12);
+}
+
+.feedback-tab-label {
+  display: block;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+}
+
+.feedback-prompt-line {
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  margin: 0;
+}
+
+.feedback-prompt-line-last {
+  font-weight: 500;
+  color: var(--color-muted);
+  margin-bottom: 6px;
+}
+
+.feedback-arrow {
+  text-align: center;
+  color: var(--color-secondary);
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.feedback-textarea {
+  width: 100%;
+  min-height: 80px;
+  border: 1px solid rgba(38, 5, 3, 0.2);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 13px;
+  font-family: var(--font-body);
+  color: var(--color-text);
+  resize: vertical;
+}

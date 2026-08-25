@@ -75,10 +75,13 @@ run.py
 - `category` (string — matches `ResaleRate.category`)
 - `size` / `material` / `color` / `dimensions` / `storage_capacity` (all string, nullable — added Feedback Round 2. Plain columns, not a separate attributes table; which ones the Add/Edit form shows is UI logic, driven by the category→field mapping below)
 - `condition` (enum: `New`, `Like New`, `Good`, `Fair`, nullable — added Feedback Round 2, shown on every category regardless of the mapping below)
+- `resale_price_override` (decimal, nullable — added Feedback Round 4. Owner-set asking price that overrides the computed `resale_value` **everywhere** the item is displayed: item detail, dashboard, every collection it's in, public share view. Editable via a pencil icon next to the resale hero pill on item detail, same interaction pattern as editing the profile name. Was originally scoped per-collection (`CollectionItem.asking_price`) when collection sharing first shipped; moved to this single item-level field in Round 4 at Gina's explicit choice after flagging the behavior difference — same item now shows one asking price everywhere, not a different one per collection)
 - `status` (enum: `Captured`, `Surfaced`, `Listed`, `Sold` — always `Captured` in Phase 1, but define all four now)
 - `source` (enum: `manual`, `auto` — always `manual` in Phase 1)
-- `is_archived` (boolean, default `false` — added Feedback Round 2. Independent of `status`: archiving hides an item from the default dashboard view and is reversible, not a sell-lifecycle state)
+- `is_archived` (boolean, default `false` — added Feedback Round 2. Independent of `status`: archiving hides an item from the default dashboard view and total, is reversible, and covers any reason an item's no longer active (sold, lost, gifted) — not just a sell-lifecycle state. On a public share view, an archived item shows greyed out with a "SOLD" badge rather than being excluded)
 - `created_at` (datetime, default now)
+
+**Resale value display:** `displayed_resale_value` = `resale_price_override` if set, else the computed `resale_value` (`price_purchased * ResaleRate.multiplier` for `category`, falling back to the `default` row). Compute/resolve at render time everywhere it's shown — item cards, item detail, total cache value, success screen, public share view — never persist it, so admin changes to `ResaleRate` apply retroactively to every item without an override, with no recompute job.
 
 **Category → attribute field mapping** (Feedback Round 2, Section 9 — drives which fields the Add/Edit item form shows; `condition` and the base fields above are always shown regardless of category):
 
@@ -101,17 +104,23 @@ run.py
 - `user_id` (FK → User)
 - `name` (string)
 - `description` (text, nullable — added when collection sharing was pulled into scope, see note below)
-- `share_token` (string, unique, indexed, random — the public share URL is `/c/<share_token>`, never `/collections/<id>`. Collection ids are sequential/guessable; if the public link used the id directly, anyone could enumerate every user's collections once a single one was shared. `share_token` is the only way in.)
+- `is_public` (boolean, default `false` — added Feedback Round 4. Explicit opt-in: a collection is private until the owner toggles it on)
+- `share_token` (string, unique, indexed, nullable — only set while `is_public`. Generated when visibility is toggled on, **cleared** when toggled off, so an old link 404s immediately rather than staying valid. The public share URL is `/c/<share_token>`, never `/collections/<id>` — collection ids are sequential/guessable, and using them directly would let anyone enumerate every user's collections the moment a single one was ever shared)
 - `created_at` (datetime, default now)
 
 **CollectionItem** (join table, many-to-many)
 - `collection_id` (FK → Collection)
 - `item_id` (FK → Item)
-- `asking_price` (decimal, nullable — owner-editable override shown on the public share page in place of the computed `resale_value`. Falls back to `Item.resale_value` when unset. Scoped to the join row, not the Item itself, so the same item can carry a different asking price in different collections without touching its canonical resale math.)
 
-**Note — collection sharing pulled forward from Phase 2:** originally Section 9 listed "collection sharing links" as explicitly out of scope. Gina asked for it mid-build (public link with a "Success!" popup + copy button on creation, owner name/photo + collection name + description + items with purchase/asking price on the public page). Implemented as `GET /c/<share_token>` — public, no login required, looked up only by the random token above.
+**Note — collection sharing pulled forward from Phase 2:** originally Section 9 listed "collection sharing links" as explicitly out of scope. Gina asked for it mid-build (public link with a "Success!" popup + copy button, owner name/photo + collection name + description + items with purchase/asking price on the public page). First shipped as "always shareable" (every collection got a permanent token at creation, no toggle) with a per-collection asking-price override (`CollectionItem.asking_price`). Both redesigned in Feedback Round 4 at Gina's explicit choice: sharing became an explicit public/private toggle (above), and the price override moved to a single item-level field (`Item.resale_price_override`, see Item above) — confirmed with her directly since both were real behavior changes, not just naming, and the Round 4 feedback doc described them differently than what was actually built through Round 3.
 
-**Resale value calculation (not stored):** for a given item, `resale_value = item.price_purchased * ResaleRate.multiplier` where the multiplier is looked up by `item.category`, falling back to the `default` row if no match exists. Compute this at render time everywhere it's displayed (item cards, item detail, total cache value, success screen) — never persist it, so admin changes to `ResaleRate` apply retroactively with no recompute job.
+**Feedback** (in-app feedback widget, added Feedback Round 4)
+- `id` (PK)
+- `user_id` (FK → User)
+- `message` (text)
+- `page_context` (string, nullable — the route the user was on when submitting, captured automatically server-side via the current request path, never a field the user sees or fills in)
+- `created_at` (datetime, default now)
+- No in-app view of submissions — reviewed via Flask-Admin only (read-only there: creation/editing disabled, it's a submission log, not editable content)
 
 ---
 
@@ -124,17 +133,23 @@ run.py
 | GET | `/logout` | Yes | Clear session, redirect to `/login` |
 | GET | `/` | Yes | See Cache dashboard. Accepts `?category=` query param(s) for filtering (multi-select) |
 | GET/POST | `/add` | Yes | Add-item form. On submit: compress+upload photo to Supabase Storage, create Item (`status=Captured`, `source=manual`), show success screen with count-up animation, redirect to `/` |
-| GET | `/item/<id>` | Yes, owner only | Item detail — both purchase price and computed resale value shown |
-| GET/POST | `/item/<id>/edit` | Yes, owner only | Edit form, reuses the Add Item field set (Section 8, Feedback Round 2), pre-filled. Photo optional — only replaced if a new one is chosen |
+| GET | `/item/<id>` | Yes, owner only | Item detail — purchase price and displayed resale value (computed or overridden) shown, resale value editable via a pencil icon. ⋮ menu, top to bottom: Edit item (neutral) → Archive/Unarchive item (pine, reversible) → divider → Delete item (orange, irreversible) |
+| GET/POST | `/item/<id>/edit` | Yes, owner only | Edit form, reuses the Add Item field set (Section 8, Feedback Round 2), pre-filled. Photo optional — only replaced if a new one is chosen, old one cleaned up from Supabase Storage when it is |
 | POST | `/item/<id>/archive` | Yes, owner only | Toggles `is_archived` (reversible), redirects back to the item |
+| POST | `/item/<id>/resale_override` | Yes, owner only | Set (or clear, via blank submit) `resale_price_override` — the single asking price shown for this item everywhere |
 | POST | `/item/<id>/delete` | Yes, owner only | Delete after confirmation modal, redirect to `/` |
-| GET | `/profile` | Yes | Profile picture (placeholder icon), name, "Caching since [date]", cache value, My Collections list |
-| POST | `/collections` | Yes | Create a named collection with an optional description; redirects to its detail page with `?created=1` to trigger the share-link success modal |
-| GET | `/collections/<id>` | Yes, owner only | View/manage items in a collection, edit per-item asking price, reopen the share modal |
+| GET | `/profile` | Yes | Profile picture (placeholder icon), name, "Caching since [date]", cache value, My Collections list (swipe-left reveals a delete action per row) |
+| POST | `/collections` | Yes | Create a named collection with an optional description (private by default) |
+| GET | `/collections/<id>` | Yes, owner only | View/manage items in a collection. Header icons (share/edit/add-item) top-right; centered info block (name, "Created [Month Year]" tag, description) below. `?share_modal=1` reopens the share modal (used after toggling visibility) |
+| POST | `/collections/<id>/edit` | Yes, owner only | Edit collection name/description |
+| POST | `/collections/<id>/toggle_visibility` | Yes, owner only | Flips `is_public`. Turning on generates a `share_token`; turning off clears it, invalidating any existing shared link immediately |
+| POST | `/collections/<id>/delete` | Yes, owner only | Delete confirmation modal (swipe-to-delete on Profile's list, or "Delete Collection" link under Save on the edit panel — both lead here), then deletes the Collection and its `CollectionItem` rows only, not the underlying Items |
 | POST | `/collections/<id>/add_item` | Yes, owner only | Add an item to a collection (item can belong to multiple) |
-| POST | `/collections/<id>/item/<item_id>/price` | Yes, owner only | Set (or clear) that item's asking-price override for this collection |
-| GET | `/c/<share_token>` | **No** | Public shared-collection page — owner name/photo, collection name/description, items with purchase + asking price |
+| POST | `/collections/<id>/item/<item_id>/remove` | Yes, owner only | Remove an item from this collection only (× icon on its card) — unlinks the `CollectionItem` row, does not delete the `Item` |
+| GET | `/c/<share_token>` | **No** | Public shared-collection page — only reachable while `is_public`. Owner name/photo, collection name, "Created [Month Year]" tag, description, items with purchase + displayed resale value. Archived items shown greyed out with a "SOLD" badge, not hidden. Filterable by category when more than one is present |
+| GET | `/c/<share_token>/item/<id>` | **No** | Public item detail, scoped by both `share_token` and collection membership (not `item_id` alone) — otherwise anyone with one shared link could view any item in the app by guessing ids. Back arrow returns to that specific shared collection |
 | GET | `/sell` | Yes | Stub page — muted styling, "Coming soon" tag, no functionality |
+| POST | `/feedback` | Yes | Submits the feedback widget popup — message + auto-captured `page_context` (current route, not user-entered). No confirmation screen, popup just closes |
 
 Any protected route hit while logged out redirects to `/login`.
 
@@ -183,6 +198,13 @@ Any protected route hit while logged out redirects to `/login`.
 - Brand wordmark "cache": **Unbounded, weight 900**, always lowercase — in the header/logo treatment AND any body-text mention of the brand name. Do not vary this by screen.
 
 **Layout & responsiveness:** mobile-first, not split evenly with desktop. Every screen's layout, spacing, and touch-target sizing is designed for a phone-width viewport first — matches the mockups (all phone-frame layouts) and the actual use case (casual, on-the-go capture). Desktop just needs to flex reasonably (content stays centered/capped in a mobile-width column via `.app-shell`, nothing stretches or breaks) — it is not a co-equal design target and doesn't get its own layout pass. Confirmed with Gina during Step 3 review.
+
+**Post-launch feedback rounds — visual changes applied across every screen:**
+- Type scale increased ~15% uniformly (labels, body, numbers, headings) — mobile readability was a real issue at the original sizes.
+- Page titles (My Cache / Profile / Sell) render in Unbounded, forced lowercase, no separate wordmark bar — just the title text in the display face, with extra spacing below before content starts.
+- Solid 18px cherry bar at the very top of every page (including unauthenticated screens — splash/login/register), added once to `base.html` rather than per-screen.
+- Header rows with a Filters button: title left, Filters right, same row (space-between) — not stacked, not its own row.
+- Item cards (dashboard, collections): category tag moved off the text row onto the photo itself — small olive-lime pill at ~92% opacity, bottom-right corner, white text. Price row below shows only the resale-value hero pill (bold cherry) and a small struck-through purchase price, nothing else competing for space.
 
 ---
 

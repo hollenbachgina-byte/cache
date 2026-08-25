@@ -28,6 +28,7 @@ def create_app(config_class=Config):
     from app.routes.profile import profile_bp
     from app.routes.collections import collections_bp
     from app.routes.sell import sell_bp
+    from app.routes.feedback import feedback_bp
 
     app.register_blueprint(health_bp)
     app.register_blueprint(auth_bp)
@@ -36,6 +37,7 @@ def create_app(config_class=Config):
     app.register_blueprint(profile_bp)
     app.register_blueprint(collections_bp)
     app.register_blueprint(sell_bp)
+    app.register_blueprint(feedback_bp)
 
     from app.admin import init_admin
 
