@@ -465,12 +465,6 @@ body {
   text-decoration: line-through;
 }
 
-.category-tag-small {
-  padding: 2px 8px;
-  font-size: 9px;
-  margin-top: 6px;
-}
-
 .item-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -495,6 +489,19 @@ body {
   margin-bottom: 6px;
   background-size: cover;
   background-position: center;
+  position: relative;
+}
+
+.item-card-category-overlay {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  background: rgba(110, 130, 67, 0.92);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 999px;
 }
 
 .item-card-name {
