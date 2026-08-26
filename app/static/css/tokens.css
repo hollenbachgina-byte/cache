@@ -1246,6 +1246,16 @@ textarea.field-input {
   padding: 8px 0;
 }
 
+.profile-logout-link {
+  display: block;
+  text-align: center;
+  color: var(--color-muted);
+  font-size: 12px;
+  font-weight: 500;
+  text-decoration: none;
+  margin-top: 24px;
+}
+
 /* Collection detail */
 .collection-header-icons {
   display: flex;

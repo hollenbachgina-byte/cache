@@ -73,6 +73,8 @@
     <p class="empty-collections">No collections yet.</p>
     {% endif %}
   </div>
+
+  <a href="{{ url_for('auth.logout') }}" class="profile-logout-link">Log out</a>
 </div>
 
 <div class="modal-overlay" data-delete-collection-modal>
