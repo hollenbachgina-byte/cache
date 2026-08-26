@@ -1700,7 +1700,7 @@ textarea.pill-field-input {
      the FAB's own edge-inset convention used elsewhere. */
   bottom: 146px;
   right: max(0px, calc((100vw - 480px) / 2));
-  background: var(--color-accent);
+  background: var(--color-secondary);
   border: none;
   width: 28px;
   height: 84px;
